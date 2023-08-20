@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "564012083826",
+    "project_id": "divinitygames-a3899",
+    "storage_bucket": "divinitygames-a3899.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:564012083826:android:e7852292bb763e1c85f0eb",
+        "android_client_info": {
+          "package_name": "com.divinity.games"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "564012083826-q2oc6l9snkvk50es4e39uaub71poit9b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.divinity.games",
+            "certificate_hash": "1984abe1fa34423b8c2b6dd1c364bcd1b6f92aa1"
+          }
+        },
+        {
+          "client_id": "564012083826-6jgtp7alb297rh9o99u3cktgsscbijog.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbjZ5M3ShELo1qGFdVyddVgxq_kODpT44"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "564012083826-6jgtp7alb297rh9o99u3cktgsscbijog.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
