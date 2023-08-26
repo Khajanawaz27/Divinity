@@ -27,9 +27,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Ludo.unity
     guid: 43f5778ea6f174a1cb2317a89092906a
   - enabled: 1
-    path: Assets/Scenes/8BallPool.unity
-    guid: 55a038a6dc312374687e7c4b80f11c95
-  - enabled: 1
     path: Assets/ArcheryShooting/Scenes/Archery.unity
     guid: 26edbce736efd4a23bab3aa0f7f8ed4b
   - enabled: 1
@@ -41,4 +38,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Slot.unity
     guid: 1b6f9adcaed688a46b4fe931f655bb69
+  - enabled: 1
+    path: Assets/8BallPool/8Ball/Scenes/Menu.unity
+    guid: 08bb5fa99022a41bea561b94ed09f77b
+  - enabled: 1
+    path: Assets/8BallPool/8Ball/Scenes/GameScene.unity
+    guid: cc305359b20c44c969982101dff7fdf5
   m_configObjects: {}

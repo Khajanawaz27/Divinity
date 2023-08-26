@@ -69,7 +69,7 @@ public class OfflineStrikerAnimator : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         StrikerStoppedMoving();
         if (animateStrikerOutDuration > animateStrikerOutEndDuration && animateStrikerOut)

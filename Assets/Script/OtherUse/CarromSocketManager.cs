@@ -59,7 +59,17 @@ public class CarromSocketManager : MonoBehaviour
 
     #region Send Socket
 
-    public void Strike_Slider_Send(float posX)
+    public void SendCarromTurn()
+    {
+        JSONObject obj = new JSONObject();
+        obj.AddField("PlayerID", DataManager.Instance.playerData._id);
+        obj.AddField("TournamentID", DataManager.Instance.tournamentID);
+        obj.AddField("PlayerNo", DataManager.Instance.playerNo);
+        obj.AddField("RoomId", TestSocketIO.Instace.roomid);
+        TestSocketIO.Instace.Senddata("CarromTurn", obj);
+    }
+
+    public void SendCarromStrikeMove(float posX)
     {
         JSONObject obj = new JSONObject();
         obj.AddField("PlayerID", DataManager.Instance.playerData._id);
@@ -67,9 +77,36 @@ public class CarromSocketManager : MonoBehaviour
         obj.AddField("PlayerNo", DataManager.Instance.playerNo);
         obj.AddField("SliderPos", posX);
         obj.AddField("RoomId", TestSocketIO.Instace.roomid);
-        TestSocketIO.Instace.Senddata("CarromSlideData", obj);
+        TestSocketIO.Instace.Senddata("CarromStrikeMove", obj);
     }
 
+    public void SendCarromStrikeAngel(Vector3 angelPos)
+    {
+        JSONObject obj = new JSONObject();
+        obj.AddField("PlayerID", DataManager.Instance.playerData._id);
+        obj.AddField("TournamentID", DataManager.Instance.tournamentID);
+        obj.AddField("PlayerNo", DataManager.Instance.playerNo);
+        obj.AddField("SliderAngleX", angelPos.x);
+        obj.AddField("SliderAngleY", angelPos.y);
+        obj.AddField("SliderAngleZ", angelPos.z);
+        obj.AddField("RoomId", TestSocketIO.Instace.roomid);
+        TestSocketIO.Instace.Senddata("CarromStrikeAngel", obj);
+    }
+
+    public void SendCarromStrikeForce(Vector3 sendForce)
+    {
+        JSONObject obj = new JSONObject();
+        obj.AddField("PlayerID", DataManager.Instance.playerData._id);
+        obj.AddField("TournamentID", DataManager.Instance.tournamentID);
+        obj.AddField("PlayerNo", DataManager.Instance.playerNo);
+        obj.AddField("ForceAngleX", sendForce.x);
+        obj.AddField("ForceAngleY", sendForce.y);
+        obj.AddField("ForceAngleZ", sendForce.z);
+        obj.AddField("RoomId", TestSocketIO.Instace.roomid);
+        TestSocketIO.Instace.Senddata("CarromStrikeForce", obj);
+    }
+
+    /*
     public void Strike_Slider_Receive(float pos)
     {
         //print("Player Pos = : " + pos);
@@ -174,6 +211,9 @@ public class CarromSocketManager : MonoBehaviour
         //print("Receive Force : " + new Vector2(-posX, -posY));
         strikeOpp.Strike_Dire_Rec(new Vector3(posX1, posY1, posZ1));
     }
+    */
+    
+    
 
     #endregion
 }

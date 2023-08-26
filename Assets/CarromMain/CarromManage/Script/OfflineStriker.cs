@@ -119,7 +119,7 @@ public class OfflineStriker : MonoBehaviour
         EnableOrDisableDots(false);
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (numberOfDots > 40)
         {
@@ -200,7 +200,7 @@ public class OfflineStriker : MonoBehaviour
 
             float checkValue = Mathf.Sqrt(ballFingerDiff.x * ballFingerDiff.x + ballFingerDiff.y * ballFingerDiff.y);
 
-            CarromSocketManager.Instance.Strike_Direction_Send(ballFingerDiff);
+            //CarromSocketManager.Instance.Strike_Direction_Send(ballFingerDiff);
             if (checkValue > 0.4f)
             {
                 if (beforeValue != checkValue)
@@ -209,6 +209,7 @@ public class OfflineStriker : MonoBehaviour
 
                     print("Ball Finger Diff : " + ballFingerDiff);
                     //print("Greejesh Angel Get");
+                    CarromSocketManager.Instance.SendCarromStrikeAngel(ballFingerDiff);
                 }
                 trajectoryDots.SetActive(true);
                 arrow.SetActive(true);
@@ -262,8 +263,9 @@ public class OfflineStriker : MonoBehaviour
             DisableBallTrigger();
             Vector2 forceVelo = new Vector2(shotForce.x, shotForce.y);
             ballRB.velocity = forceVelo;
+            CarromSocketManager.Instance.SendCarromStrikeForce(forceVelo);
 
-            if (forceVelo.x < 0)
+            /*if (forceVelo.x < 0)
             {
                 forceVelo.x = Mathf.Abs(forceVelo.x);
             }
@@ -279,10 +281,10 @@ public class OfflineStriker : MonoBehaviour
             else
             {
                 forceVelo.x = -forceVelo.x;
-            }
+            }*/
             print("Send Force : " + forceVelo);
             print("Sedn Shot Force : " + shotForce);
-            CarromSocketManager.Instance.Strike_Fire_Send(forceVelo);
+            //CarromSocketManager.Instance.Strike_Fire_Send(forceVelo);
             print("Fire Velocity");
             if (ballRB.isKinematic)
             {
@@ -294,7 +296,7 @@ public class OfflineStriker : MonoBehaviour
 
     #region Socket MainTain
 
-    public void Strike_Fire(Vector2 vector)
+    /*public void Strike_Fire(Vector2 vector)
     {
         trajectoryDots.SetActive(false);
         arrow.SetActive(false);
@@ -369,9 +371,77 @@ public class OfflineStriker : MonoBehaviour
             float y2 = y1;
             obj.position = new Vector3(x, y2, dots[j].transform.position.z);
         }
+    }*/
+    
+    public void SetSocketAngel(Vector3 sendAngel)
+    {
+        Debug.Log("Receive Angel : " + sendAngel);
+        sendAngel.x = -sendAngel.x;
+        sendAngel.y = -sendAngel.y;
+        ballFingerDiff = Vector3.ClampMagnitude(sendAngel, 1.5f);
+        shotForce = new Vector2(ballFingerDiff.x * shootingPowerX, ballFingerDiff.y * shootingPowerY);
+        float num2 = Mathf.Min(1f + ballFingerDiff.magnitude * 4f, 7f);
+        arrow.transform.localScale = new Vector3(num2, num2, 1f);
+
+        float checkValue = Mathf.Sqrt(ballFingerDiff.x * ballFingerDiff.x + ballFingerDiff.y * ballFingerDiff.y);
+
+        // CarromSocketManager.Instance.Strike_Direction_Send(ballFingerDiff);
+        if (checkValue > 0.4f)
+        {
+            if (beforeValue != checkValue)
+            {
+                beforeValue = checkValue;
+
+                print("Ball Finger Diff : " + ballFingerDiff);
+                //print(" Angel Get");
+                // GameSocketManager.Instance.SendCarromStrikeAngel(GameSocketManager.Instance.GetPlayerName(), GameSocketManager.Instance.playerNo, shotForce);
+            }
+            trajectoryDots.SetActive(true);
+            arrow.SetActive(true);
+            EnableOrDisableDots(true);
+        }
+        else
+        {
+            trajectoryDots.SetActive(false);
+            arrow.SetActive(false);
+            ResetTrajectoryDotPositions();
+            EnableOrDisableDots(false);
+            if (ballRB.isKinematic)
+            {
+                ballRB.isKinematic = false;
+            }
+        }
+        for (int j = 0; j < numberOfDots; j++)
+        {
+            x1 = ballPos.x + shotForce.x * Time.fixedDeltaTime * (dotSeparation * (float)j + dotShift);
+            y1 = ballPos.y + shotForce.y * Time.fixedDeltaTime * (dotSeparation * (float)j + dotShift);
+            Transform obj = dots[j].transform;
+            float x = x1;
+            float y2 = y1;
+            obj.position = new Vector3(x, y2, dots[j].transform.position.z);
+        }
     }
+    
+    public void SetSocketForce(Vector3 sendForce)
+    {
+        Debug.Log("Receive Force : " + sendForce);
+        trajectoryDots.SetActive(false);
+        arrow.SetActive(false);
+        ResetTrajectoryDotPositions();
+        EnableOrDisableDots(false);
+        strikerHandler.SetStrikerMoving();
+        DisableBallTrigger();
+        Vector2 forceVelo = new Vector2(-sendForce.x, -sendForce.y);
+        ballRB.velocity = forceVelo;
 
 
+        if (ballRB.isKinematic)
+        {
+            ballRB.isKinematic = false;
+        }
+        ballIsClicked2 = false;
+    }
+    
     #endregion
 
     public void DisableBallTrigger()

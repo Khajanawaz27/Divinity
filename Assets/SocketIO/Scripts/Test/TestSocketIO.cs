@@ -205,8 +205,17 @@ public class TestSocketIO : MonoBehaviour
                 break;
             
             // Carrom
-            case "CarromSlideData":
-                SetSliderChange(values.ToString());
+            case "CarromStrikeMove":
+                SetStrikeMove(values.ToString());
+                break;
+            case "CarromStrikeAngel":
+                SetStrikeAngle(values.ToString());
+                break;
+            case "CarromStrikeForce":
+                SetStrikeForce(values.ToString());
+                break;
+            case "CarromTurn":
+                SetNextPlayer(values.ToString());
                 break;
         }
     }
@@ -1463,7 +1472,26 @@ public class TestSocketIO : MonoBehaviour
 
     #region Carrom
 
-    private void SetSliderChange(string values)
+    private void SetNextPlayer(string values)
+    {
+        if (SceneManager.GetActiveScene().name != "Carrom") return;
+        JSONNode value = JSON.Parse(values);
+        JSONNode data = JSON.Parse(value["data"].ToString());
+        print("Slider : " + values);
+        string playerId = data["PlayerID"];
+        string tourId = data["TournamentID"];
+        int playerNo = data["PlayerNo"];
+        string sRoomId = data["RoomId"];
+
+
+        if (DataManager.Instance.playerData._id == playerId) return;
+        if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
+        {
+            OfflineGameManager.Instance.NextPlayerTurn();
+        }
+    }
+
+    private void SetStrikeMove(string values)
     {
         if (SceneManager.GetActiveScene().name != "Carrom") return;
         JSONNode value = JSON.Parse(values);
@@ -1479,7 +1507,54 @@ public class TestSocketIO : MonoBehaviour
         if (DataManager.Instance.playerData._id == playerId) return;
         if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
         {
-            CarromSocketManager.Instance.Strike_Slider_Receive(pos);
+            OfflineGameManager.Instance.StrikeMoveSocket(pos); 
+        }
+    }
+    
+    private void SetStrikeAngle(string values)
+    {
+        if (SceneManager.GetActiveScene().name != "Carrom") return;
+        JSONNode value = JSON.Parse(values);
+        JSONNode data = JSON.Parse(value["data"].ToString());
+        print("Slider : " + values);
+        string playerId = data["PlayerID"];
+        string tourId = data["TournamentID"];
+        int playerNo = data["PlayerNo"];
+        string sRoomId = data["RoomId"];
+        float posX = data["SliderAngleX"];
+        float posY = data["SliderAngleY"];
+        float posZ = data["SliderAngleZ"];
+        
+
+        if (DataManager.Instance.playerData._id == playerId) return;
+        if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
+        {
+            Vector3 strikerAngel = new Vector3(posX, posY, posZ);
+            OfflineGameManager.Instance.OppOfflineStriker.SetSocketAngel(strikerAngel);
+        }
+    }
+    
+    private void SetStrikeForce(string values)
+    {
+        if (SceneManager.GetActiveScene().name != "Carrom") return;
+        JSONNode value = JSON.Parse(values);
+        JSONNode data = JSON.Parse(value["data"].ToString());
+        print("Slider : " + values);
+        string playerId = data["PlayerID"];
+        string tourId = data["TournamentID"];
+        int playerNo = data["PlayerNo"];
+        string sRoomId = data["RoomId"];
+        float posX = data["ForceAngleX"];
+        float posY = data["ForceAngleY"];
+        float posZ = data["ForceAngleZ"];
+        
+        
+
+        if (DataManager.Instance.playerData._id == playerId) return;
+        if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
+        {
+            Vector3 strikerAngel = new Vector3(posX, posY, posZ);
+            OfflineGameManager.Instance.OppOfflineStriker.SetSocketForce(strikerAngel);
         }
     }
 

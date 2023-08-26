@@ -22,7 +22,7 @@ public class StrikerMover : MonoBehaviour
     public static byte MOVE_STRIKER = 101;
 
     [SerializeField]
-    private GameObject striker;
+    private GameObject striker, OponStriker;
 
     public StrikerMover oppStrikeMover;
 
@@ -54,7 +54,7 @@ public class StrikerMover : MonoBehaviour
         GetComponent<SpriteRenderer>().sprite = ((strikerIndex >= LevelManager.instance.strikers.Length) ? LevelManager.instance.strikers[0] : LevelManager.instance.strikers[strikerIndex]);
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (animateStrikerDuration > animateStrikerEndDuration && animateStriker)
         {
@@ -113,7 +113,7 @@ public class StrikerMover : MonoBehaviour
                 if (beforeVector != vector)
                 {
                     beforeVector = vector;
-                    CarromSocketManager.Instance.Strike_Slider_Send(vector.x);
+                    CarromSocketManager.Instance.SendCarromStrikeMove(vector.x);
                     print("Greejesh Strik Slider");
                 }
                 vector.y = strikerPosition.position.y;
@@ -147,6 +147,12 @@ public class StrikerMover : MonoBehaviour
     {
         float newPos = -posX;
         striker.transform.position = new Vector2(newPos, striker.transform.position.y);
+    }
+    
+    public void SocketReviceStrikeMove(float posX)
+    {
+        OponStriker.transform.position = new Vector2(-posX, OponStriker.transform.position.y);
+        //oppStrikeMover.transform.position = new Vector2(posX, oppStrikeMover.transform.position.y);
     }
 
 

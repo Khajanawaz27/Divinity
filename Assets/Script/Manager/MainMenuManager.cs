@@ -394,6 +394,10 @@ public class MainMenuManager : MonoBehaviour
                 break;
             case 8:
                 gameName = GameType.Ball_Pool;
+                GameManager.Instance.tableNumber = 0;
+                GameManager.Instance.offlineMode = true;
+                GameManager.Instance.roomOwner = true;
+                SceneManager.LoadScene("GameScene");
                 break;
             case 9:
                 gameName = GameType.Chess;
