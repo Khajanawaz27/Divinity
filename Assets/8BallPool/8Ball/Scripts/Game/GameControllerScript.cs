@@ -4,8 +4,13 @@ using UnityEngine.UI;
 using AssemblyCSharp;
 using UnityEngine.SceneManagement;
 
-public class GameControllerScript : MonoBehaviour {
-    
+public class GameControllerScript : MonoBehaviour
+{
+
+    public Text playerName;
+    public Text opponentName;
+    public Image playerImage;
+    public Image opponentImage;
     public GameObject soundOn;
     public GameObject soundOff;
     public GameObject vibOn;
@@ -82,6 +87,7 @@ public class GameControllerScript : MonoBehaviour {
 
 
 
+        PlayerNameManage();
 
         playerTime = playerTime * Time.timeScale;
 
@@ -286,6 +292,36 @@ public class GameControllerScript : MonoBehaviour {
         GameManager.Instance.stopTimer = false;
     }
     
+    
+    public void PlayerNameManage()
+    {
+        int index1 = DataManager.Instance.playerNo == 2 ? 1 : 0;
+        int index2 = DataManager.Instance.playerNo == 2 ? 0 : 1;
+        
+        playerName.text = UserNameStringManage(DataManager.Instance.joinPlayerDatas[index1].userName);
+        opponentName.text = UserNameStringManage(DataManager.Instance.joinPlayerDatas[index2].userName);
+
+        Image img1 = playerImage;
+        Image img2 = opponentImage;
+        StartCoroutine(DataManager.Instance.GetImages(DataManager.Instance.joinPlayerDatas[index1].avtar, img1));
+        StartCoroutine(DataManager.Instance.GetImages(DataManager.Instance.joinPlayerDatas[index2].avtar, img2));
+    }
+    public string UserNameStringManage(string name)
+    {
+        if (name != null && name != "")
+        {
+            if (name.Length > 13)
+            {
+                name = name.Substring(0, 10) + "...";
+            }
+            else
+            {
+                name = name;
+            }
+        }
+        return name;
+    }
+
     
     
     #region Button Functions

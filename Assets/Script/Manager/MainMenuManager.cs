@@ -59,6 +59,9 @@ public class MainMenuManager : MonoBehaviour
     public Color offColor;
     public GameObject waitingPanel;
     public GameObject playerNotFound;
+    
+    [Header("--- Waiting Screen ---")]
+    public GameObject loadingScreen; // Reference to the loading screen game object
 
     [Header("--- LeavePanel ---")] 
     
@@ -125,6 +128,7 @@ public class MainMenuManager : MonoBehaviour
 
     public void UpdateAllData()
     {
+        waitingPanel.gameObject.SetActive(false);
         Getdata();
         //Getnotification();
     }
@@ -394,10 +398,6 @@ public class MainMenuManager : MonoBehaviour
                 break;
             case 8:
                 gameName = GameType.Ball_Pool;
-                GameManager.Instance.tableNumber = 0;
-                GameManager.Instance.offlineMode = true;
-                GameManager.Instance.roomOwner = true;
-                SceneManager.LoadScene("GameScene");
                 break;
             case 9:
                 gameName = GameType.Chess;
@@ -710,7 +710,7 @@ public class MainMenuManager : MonoBehaviour
                 DataManager.Instance.gameMode = GameType.Archery;
                 break;
             case GameType.Ball_Pool:
-                tournamentTitle.text = "BallPool";
+                tournamentTitle.text = "8BallPool";
                 DataManager.Instance.gameMode = GameType.Ball_Pool;
                 break;
             case GameType.Chess:
@@ -874,64 +874,112 @@ public class MainMenuManager : MonoBehaviour
             TestSocketIO.Instace.SlotJoinRoom();
             yield break;
         }
+        AddPlayersToGame();
         waitingPanel.SetActive(true);
         yield return new WaitForSeconds(5f);
-        waitingPanel.SetActive(false);
-        CheckRequiredPlayers();
-        
-        
+        FinalLoadGames();
     }
 
-    private void CheckRequiredPlayers()
+    private void AddPlayersToGame()
     {
-        if (DataManager.Instance.gameMode is GameType.Archery or GameType.Carrom or GameType.Chess)
+        switch (DataManager.Instance.gameMode)
         {
-            if (DataManager.Instance.joinPlayerDatas.Count is 0 or 1 or 2 && BotManager.Instance.isBotAvalible)
-            {
+            case GameType.Archery or GameType.Carrom or GameType.Chess
+                or GameType.Ball_Pool:
                 TestSocketIO.Instace.ArcheryJoinRoom();
-            }
-            else
-            {
-                ClearData();
-                StartCoroutine(ShowPopup(playerNotFound, 1.5f));
-            }
-            
-        }
-        else if (DataManager.Instance.gameMode is GameType.Poker or GameType.Teen_Patti)
-        {
-            if (DataManager.Instance.joinPlayerDatas.Count is 0 or 1 or 2 or 3 or 4 or 5 && BotManager.Instance.isBotAvalible)
-            {
-                TestSocketIO.Instace.TeenPattiJoinroom(); 
-            }
-            else
-            {
-                ClearData();
-                StartCoroutine(ShowPopup(playerNotFound, 1.5f));
-            }
-        }
-        else if (DataManager.Instance.gameMode == GameType.Ludo)
-        {
-            if (DataManager.Instance.joinPlayerDatas.Count is 0 or 1 or 2 && BotManager.Instance.isBotAvalible)
-            {
+                break;
+            case GameType.Poker or GameType.Teen_Patti:
+                TestSocketIO.Instace.TeenPattiJoinroom();
+                break;
+            case GameType.Ludo:
                 TestSocketIO.Instace.LudoJoinroom();
-                
+                break;
+        }
+    }
+
+    private void FinalLoadGames()
+    {
+        if (DataManager.Instance.gameMode == GameType.Archery)
+        {
+            if (DataManager.Instance.joinPlayerDatas.Count == 2)
+            {
+                TestSocketIO.Instace.StartGame();
+            }
+            else if(BotManager.Instance.isBotAvalible)
+            {
+                // bot will be added to the game
+                OpenLoadScreen();
+                TestSocketIO.Instace.StartGame();
             }
             else
             {
+                TestSocketIO.Instace.LeaveRoom();
                 ClearData();
                 StartCoroutine(ShowPopup(playerNotFound, 1.5f));
             }
         }
+        else if (DataManager.Instance.gameMode is GameType.Carrom or GameType.Ball_Pool)
+        {
+            if (DataManager.Instance.joinPlayerDatas.Count == 2)
+            {
+                TestSocketIO.Instace.LoadSelectedGameScene();
+            }
+            else if(BotManager.Instance.isBotAvalible)
+            {
+                // bot will be added to the game
+                OpenLoadScreen();
+                TestSocketIO.Instace.LoadSelectedGameScene();
+            }
+            else
+            {
+                TestSocketIO.Instace.LeaveRoom();
+                ClearData();
+                StartCoroutine(ShowPopup(playerNotFound, 1.5f));
+            }
+        }
+        else if (DataManager.Instance.gameMode == GameType.Chess)
+        {
+            if (DataManager.Instance.joinPlayerDatas.Count == 2)
+            {
+                TestSocketIO.Instace.LoadSelectedGameScene();
+            }
+            else if(BotManager.Instance.isBotAvalible)
+            {
+                // bot will be added to the game
+                OpenLoadScreen();
+                TestSocketIO.Instace.LoadSelectedGameScene();
+            }
+            else
+            {
+                TestSocketIO.Instace.LeaveRoom();
+                ClearData();
+                StartCoroutine(ShowPopup(playerNotFound, 1.5f));
+            }
+        }
+        else if (DataManager.Instance.gameMode is GameType.Teen_Patti or GameType.Poker)
+        {
+            if (DataManager.Instance.joinPlayerDatas.Count == 5)
+            {
+                TestSocketIO.Instace.LoadSelectedGameScene();
+            }
+            // if there is 3 players then bot is disabled
+            else if (DataManager.Instance.joinPlayerDatas.Count <= 4 && BotManager.Instance.isBotAvalible)
+            {
+                CheckPlayers();
+                TestSocketIO.Instace.LoadSelectedGameScene();
+            }
+            else
+            {
+                TestSocketIO.Instace.LeaveRoom();
+                ClearData();
+                StartCoroutine(ShowPopup(playerNotFound, 1.5f));
+            }
+        }
+        //waitingPanel.SetActive(false);
     }
 
     public void ClearData()
     {
-        DataManager.Instance.tournamentID = "";
-        DataManager.Instance.tourEntryMoney = 0;
-        DataManager.Instance.tourCommision = 0;
-        DataManager.Instance.commisionAmount = 0;
-        DataManager.Instance.orgIndexPlayer = 0;
-        DataManager.Instance.joinPlayerDatas.Clear();
         isPressJoin = false;
         TestSocketIO.Instace.roomid = "";
         TestSocketIO.Instace.userdata = "";
@@ -943,6 +991,7 @@ public class MainMenuManager : MonoBehaviour
     {
         gameObject.SetActive(true);
         yield return new WaitForSeconds(duration);
+        waitingPanel.gameObject.SetActive(false);
         gameObject.SetActive(false);
     }
     

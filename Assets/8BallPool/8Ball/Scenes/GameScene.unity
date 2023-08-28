@@ -2037,6 +2037,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb5a5393a35ec4a25bc44c844e2d434c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerName: {fileID: 225509680}
+  opponentName: {fileID: 367251320}
+  playerImage: {fileID: 2084891611}
+  opponentImage: {fileID: 534512822}
   soundOn: {fileID: 4313416266835428795}
   soundOff: {fileID: 4313416265944417335}
   vibOn: {fileID: 4313416267651827373}
@@ -7225,7 +7229,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d6b676a4eb37549ecb09cb5a0770886e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 359a787878ea17c4eaa33de0681d1384, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

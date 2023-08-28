@@ -387,7 +387,7 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
             }
             else
             {
-                playingPlayer = opponentPlayer;//Greejesh Main
+                playingPlayer = opponentPlayer;
             }
             playerScoreView = leftScoreView;
             opponentScoreView = rightScoreView;

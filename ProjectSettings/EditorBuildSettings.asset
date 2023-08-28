@@ -39,9 +39,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Slot.unity
     guid: 1b6f9adcaed688a46b4fe931f655bb69
   - enabled: 1
-    path: Assets/8BallPool/8Ball/Scenes/Menu.unity
-    guid: 08bb5fa99022a41bea561b94ed09f77b
-  - enabled: 1
     path: Assets/8BallPool/8Ball/Scenes/GameScene.unity
     guid: cc305359b20c44c969982101dff7fdf5
   m_configObjects: {}

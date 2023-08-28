@@ -108,7 +108,7 @@ public class CueController : MonoBehaviour
         GameManager.Instance.iLost = false;
 
 
-        setPrizeText();
+        SetPrizeText();
 
         potedBallsGUI = GameObject.Find("PotedBallsGUI").GetComponent<PotedBallsGUIController>();
         GameManager.Instance.ballHand = ballHand;
@@ -218,14 +218,11 @@ public class CueController : MonoBehaviour
         cue.GetComponent<SpriteRenderer>().sprite = cueTextures[index];
     }
 
-    private void setPrizeText()
+    private void SetPrizeText()
     {
+        float prizeCoins = DataManager.Instance.winAmount;
 
-        
-
-        int prizeCoins = GameManager.Instance.payoutCoins * 2;
-
-        if (prizeCoins >= 1000)
+        /*if (prizeCoins >= 1000)
         {
             if (prizeCoins >= 1000000)
             {
@@ -257,10 +254,15 @@ public class CueController : MonoBehaviour
         else
         {
             prizeText.GetComponent<Text>().text = prizeCoins + "";
-        }
+        }*/
 
-        if(GameManager.Instance.offlineMode) {
+        if(GameManager.Instance.offlineMode) 
+        {
             prizeText.GetComponent<Text>().text = "Practice";
+        }
+        else
+        {
+            prizeText.GetComponent<Text>().text = "₹ " + prizeCoins;
         }
     }
 

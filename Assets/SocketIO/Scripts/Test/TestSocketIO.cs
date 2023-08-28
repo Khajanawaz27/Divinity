@@ -27,9 +27,6 @@ public class TestSocketIO : MonoBehaviour
     public int andarBaharRequirePlayer;
     public int ludoRequirePlayer;
     
-    [Header("--- Waiting Screen ---")]
-    public GameObject loadingScreen; // Reference to the loading screen game object
-
     private void Awake()
     {
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
@@ -237,8 +234,6 @@ public class TestSocketIO : MonoBehaviour
         userdata.AddField("lobbyId", DataManager.Instance.tournamentID);
         userdata.AddField("maxp", 2);
         userdata.AddField("avtar", PlayerPrefs.GetString("ProfileURL"));
-        //userdata.AddField("token", PlayerPrefs.GetString("token"));
-
         if (DataManager.Instance.CheckRoomUser(DataManager.Instance.playerData._id.ToString().Trim('"')) == true)
         {
             socket.Emit("join", userdata);
@@ -447,48 +442,6 @@ public class TestSocketIO : MonoBehaviour
                     DataManager.Instance.AddRoomUser(values["data"]["users"][i]["userId"], values["data"]["users"][i]["name"], values["data"]["users"][i]["lobbyId"], values["data"]["users"][i]["balance"], i, values["data"]["users"][i]["avtar"]);
                 }
             }
-            //if (obj["users"].Count >= teenPattiRequirePlayer && SceneManager.GetActiveScene().name == "Main")
-            //{
-            //    //Open Scene
-            //    SceneManager.LoadScene(DataManager.Instance.GetModeToSceneName(DataManager.Instance.gameMode));
-            //}
-
-            /*if (SceneManager.GetActiveScene().name == "Main")
-            {// For Single Player
-                for (int i = 0; i < obj.Count; i++)
-                {
-                    if (values["data"]["users"][i]["name"] != null && values["data"]["users"][i]["userId"] != null && values["data"]["users"][i]["lobbyId"] != null)
-                    {
-                        DataManager.Instance.AddRoomUser(values["data"]["users"][i]["userId"], values["data"]["users"][i]["name"], values["data"]["users"][i]["lobbyId"], values["data"]["users"][i]["balance"], i, values["data"]["users"][i]["avtar"]);
-                    }
-                }
-            }*/
-
-            /*if (DataManager.Instance.joinPlayerDatas.Count > 1)
-            {// For Single Player
-                var playerId = DataManager.Instance.playerData._id; // player ID to match
-                var joinPlayerDatas = DataManager.Instance.joinPlayerDatas; // list of join player data
-                joinPlayerDatas.RemoveAll(joinPlayerData => joinPlayerData.userId != playerId);
-            }*/
-            
-            
-            
-            // if there is 3 players then bot is disabled 
-            if (DataManager.Instance.joinPlayerDatas.Count <= 4)
-            {
-                MainMenuManager.Instance.CheckPlayers();
-            }
-            
-            //if (obj["users"].Count >= teenPattiRequirePlayer && SceneManager.GetActiveScene().name == "Main")
-            //{
-            //    //Open Scene
-            //    SceneManager.LoadScene(DataManager.Instance.GetModeToSceneName(DataManager.Instance.gameMode));
-            //}
-
-            if (SceneManager.GetActiveScene().name == "Main")
-            {
-                SceneManager.LoadScene(DataManager.Instance.GetModeToSceneName(DataManager.Instance.gameMode));
-            }
 
             if (SceneManager.GetActiveScene().name == "TeenPatti")//obj["users"].Count >= teenPattiRequirePlayer && 
             {
@@ -586,95 +539,24 @@ public class TestSocketIO : MonoBehaviour
 
             for (int i = 0; i < obj.Count; i++)
             {
-                int pNo = 0;
-                if (DataManager.Instance.isTwoPlayer)
+                int pNo = DataManager.Instance.gameMode switch
                 {
-                    if (i == 0)
-                    {
-                        pNo = 1;
-                    }
-                    else if (i == 1)
-                    {
-                        pNo = 3;
-                    }
-                }
-                else
-                {
-                    pNo = i + 1;
-                }
+                    GameType.Ludo => (i == 0) ? 1 : 3,
+                    GameType.Carrom => (i == 0) ? 1 : 2,
+                    GameType.Ball_Pool => (i == 0) ? 1 : 2,
+                    _ => i + 1
+                };
                 if (values["data"]["users"][i]["name"] != null && values["data"]["users"][i]["userId"] != null && values["data"]["users"][i]["lobbyId"] != null)
                 {
                     DataManager.Instance.AddRoomUser(values["data"]["users"][i]["userId"], values["data"]["users"][i]["name"], values["data"]["users"][i]["lobbyId"], values["data"]["users"][i]["balance"], pNo, values["data"]["users"][i]["avtar"]);
                 }
-                /*if (obj["users"].Count == 2 && SceneManager.GetActiveScene().name == "Main")
-                {
-                    SceneManager.LoadScene(DataManager.Instance.GetModeToSceneName(DataManager.Instance.gameMode));
-                }*/
-
-            }
-            /*if (obj["users"].Count == 1 && SceneManager.GetActiveScene().name == "Main")
-            {
-                SceneManager.LoadScene(DataManager.Instance.GetModeToSceneName(DataManager.Instance.gameMode));
-            }*/
-
-            if (DataManager.Instance.gameMode == GameType.Archery)
-            {
-                /*if (DataManager.Instance.joinPlayerDatas.Count == 1)
-                {
-                    MainMenuManager.Instance.OpenLoadScreen();
-                }
-
-                SceneManager.LoadScene(DataManager.Instance.GetModeToSceneName(DataManager.Instance.gameMode));*/
-                if (!loadingScreen.activeSelf)
-                {
-                    StartWaitingProcess();
-                }
-
-                if (loadingScreen.activeSelf && DataManager.Instance.joinPlayerDatas.Count == 2)
-                {
-                    print("Inside the pass");
-                    //StartGame();
-                    CancelInvoke(nameof(CheckPlayersJoined));
-                    CheckPlayersJoined();
-                }
-                print("not passed");
             }
             
-            if (DataManager.Instance.gameMode == GameType.Carrom)
-            {
-                SceneManager.LoadScene(DataManager.Instance.GetModeToSceneName(DataManager.Instance.gameMode));
-            }
-            
-            if (DataManager.Instance.gameMode == GameType.Chess)
-            {
-                if (DataManager.Instance.joinPlayerDatas.Count == 1)
-                {
-                    MainMenuManager.Instance.OpenLoadScreen();
-                }
-                SceneManager.LoadScene(DataManager.Instance.GetModeToSceneName(DataManager.Instance.gameMode));
-            }
-
             if (SceneManager.GetActiveScene().name != "Ludo") return;
             if (LudoManager.Instance == null) return;
             LudoManager.Instance.PlayerJoined();
             //SetGameId(DataManager.Instance.tournamentID);
             print("Inside socket is called");
-
-
-            //if (DataManager.Instance.isGameTestMode == tr)
-            //{
-            // if (DataManager.Instance.joinPlayerDatas.Count == 2)
-            // {
-            //     //StartCoroutine(MainMenuManager.Instance.LoadScene());
-            //     MainMenuManager.Instance.ChangeScene();
-            //     //DataManager.Instance.isBot = true;
-            // }
-            //}
-
-            //if (DataManager.Instance.joinPlayerDatas.Count == 1)
-            //{
-            //    MainMenuManager.Instance.OpenTournamentLoadScreen();
-            //}
         }
         else if (obj["users"][0]["maxp"] == 4)
         {
@@ -744,12 +626,19 @@ public class TestSocketIO : MonoBehaviour
             print("Inside socket is called");
         }
     }
+    
+
+    public void LoadSelectedGameScene()
+    {
+        SceneManager.LoadScene(DataManager.Instance.GetModeToSceneName(DataManager.Instance.gameMode));
+    }
+    
 
     #region Waiting screen
 
     private void StartWaitingProcess()
     {
-        loadingScreen.SetActive(true);
+        //loadingScreen.SetActive(true);
         if (DataManager.Instance.joinPlayerDatas.Count == 2)
         {
             CheckPlayersJoined();
@@ -782,7 +671,7 @@ public class TestSocketIO : MonoBehaviour
         StartGame();
     }
     
-    private void StartGame()
+    public void StartGame()
     {
         StartCoroutine(LoadSceneAndDeactivateLoadingScreen());
     }
@@ -797,8 +686,8 @@ public class TestSocketIO : MonoBehaviour
             yield return null;
         }
 
-        // Scene has finished loading, deactivate the loading screen
-        loadingScreen.SetActive(false);
+        /*// Scene has finished loading, deactivate the loading screen
+        loadingScreen.SetActive(false);*/
     }
     #endregion
 
