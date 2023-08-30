@@ -2049,6 +2049,10 @@ MonoBehaviour:
   sfxOff: {fileID: 4313416265918457063}
   menuScreenObj: {fileID: 6661887086418373177}
   settingsScreenObj: {fileID: 8267592694924198554}
+  imageClock1: {fileID: 1114077495}
+  imageClock2: {fileID: 963144175}
+  messageBubble: {fileID: 1059548565}
+  messageBubbleText: {fileID: 444702998}
   playerTime: 10
   cueController: {fileID: 396246494}
   shotPowerObject: {fileID: 686825738}
@@ -2986,9 +2990,13 @@ MonoBehaviour:
   posDetector: {fileID: 1714890444}
   text: {fileID: 0}
   isServer: 0
+  lineRenderer: {fileID: 2073259029}
+  lineRenderer2: {fileID: 1827603564}
+  lineRenderer3: {fileID: 269097678}
   ShotPowerInd: {fileID: 686825738}
   ShotPowerIndicator: {fileID: 0}
-  targetLine: {fileID: 0}
+  targetLine: {fileID: 1180501625}
+  circle: {fileID: 946485639}
   layerMask:
     serializedVersion: 2
     m_Bits: 4294964735
@@ -3009,7 +3017,7 @@ MonoBehaviour:
   whiteBallLimits: {fileID: 1043177346}
   ballHand: {fileID: 322714528}
   youWonMessage: {fileID: 1252616809}
-  potedBallsGUI: {fileID: 0}
+  potedBallsGUI: {fileID: 2049399608}
   whiteBallTrigger: {fileID: 0}
   callPocketsButtons:
   - {fileID: 577700026}

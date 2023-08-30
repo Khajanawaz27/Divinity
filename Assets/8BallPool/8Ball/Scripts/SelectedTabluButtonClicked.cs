@@ -31,7 +31,7 @@ public class SelectedTabluButtonClicked : MonoBehaviour {
                 GameManager.Instance.tableNumber = tableNumber;
                 GameManager.Instance.payoutCoins = fee;
                 GameManager.Instance.initMenuScript.backToMenuFromTableSelect();
-                GameManager.Instance.playfabManager.challengeFriend(GameManager.Instance.challengedFriendID, "" + fee + ";" + tableNumber);
+                //GameManager.Instance.playfabManager.challengeFriend(GameManager.Instance.challengedFriendID, "" + fee + ";" + tableNumber);
 
             } else {
                 GameManager.Instance.tableNumber = tableNumber;

@@ -214,6 +214,45 @@ public class TestSocketIO : MonoBehaviour
             case "CarromTurn":
                 SetNextPlayer(values.ToString());
                 break;
+            
+            // Pool
+            case "PlayerWon":
+            case "WhiteBall":
+                PoolEvents(values.ToString());
+                break;
+            case "ShortTurn":
+                Turn(values.ToString());
+                break;
+            case "PlayerType":
+                BallType(values.ToString());
+                break;
+            case "BallMovingAngel":
+                BallMovement(values.ToString());
+                break;
+            case "CueRotation":
+                CueRotation(values.ToString());
+                break;
+            case "CueSpin":
+                CueSpin(values.ToString());
+                break;
+            case "SpawnBalls":
+                SpawnBalls(values.ToString());
+                break;
+            case "SwitchUser":
+                SwitchUser(values.ToString());
+                break;
+            case "Pot":
+                PotEvent(values.ToString());
+                break;
+            case "Power":
+                ShotPower(values.ToString());
+                break;
+            case "Trigger":
+                BallTrigger(values.ToString());
+                break;
+            case "Message":
+                SetMessage(values.ToString());
+                break;
         }
     }
 
@@ -1376,6 +1415,7 @@ public class TestSocketIO : MonoBehaviour
         if (DataManager.Instance.playerData._id == playerId) return;
         if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
         {
+            print("---------Socket DiceChange is called----------------");
             OfflineGameManager.Instance.NextPlayerTurn();
         }
     }
@@ -1447,6 +1487,279 @@ public class TestSocketIO : MonoBehaviour
         }
     }
 
+
+    #endregion
+
+    #region Pool
+
+    private void PoolEvents(string values)
+    {
+        if (SceneManager.GetActiveScene().name != "Pool") return;
+        JSONNode value = JSON.Parse(values);
+        JSONNode data = JSON.Parse(value["data"].ToString());
+        string playerId = data["PlayerID"];
+        string tourId = data["TournamentID"];
+        int playerNo = data["PlayerNo"];
+        string sRoomId = data["RoomId"];
+        int code = data["EventCode"];
+        
+        if (DataManager.Instance.playerData._id == playerId) return;
+        if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
+        {
+            CueController.Instance.ProcessWonData(code);
+        }
+    }
+    
+    private void BallType(string values)
+    {
+        if (SceneManager.GetActiveScene().name != "Pool") return;
+        JSONNode value = JSON.Parse(values);
+        JSONNode data = JSON.Parse(value["data"].ToString());
+        string playerId = data["PlayerID"];
+        string tourId = data["TournamentID"];
+        int playerNo = data["PlayerNo"];
+        string sRoomId = data["RoomId"];
+        bool type = data["BallType"];
+        
+        if (DataManager.Instance.playerData._id == playerId) return;
+        if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
+        {
+            CueController.Instance.CheckBallType(type);
+        }
+    }
+    
+    private void Turn(string values)
+    {
+        if (SceneManager.GetActiveScene().name != "Pool") return;
+        JSONNode value = JSON.Parse(values);
+        JSONNode data = JSON.Parse(value["data"].ToString());
+        string playerId = data["PlayerID"];
+        string tourId = data["TournamentID"];
+        int playerNo = data["PlayerNo"];
+        string sRoomId = data["RoomId"];
+        int code = data["EventCode"];
+        float posX = data["SliderAngleX"];
+        float posY = data["SliderAngleY"];
+        float posZ = data["SliderAngleZ"];
+        float trickShotX = data["TrickShotX"];
+        float trickShotY = data["TrickShotY"];
+        float trickShotZ = data["TrickShotZ"];
+        
+        
+        if (DataManager.Instance.playerData._id == playerId) return;
+        if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
+        {
+            Vector3 shotPower = new Vector3(posX, posY, posZ);
+            Vector3 trickShot = new Vector3(trickShotX, trickShotY, trickShotZ);
+            CueController.Instance.Turn(new Vector3[] { shotPower, trickShot });
+        }
+    }
+    
+    private void SpawnBalls(string values)
+    {
+        if (SceneManager.GetActiveScene().name != "Pool") return;
+        JSONNode value = JSON.Parse(values);
+        JSONNode data = JSON.Parse(value["data"].ToString());
+        string playerId = data["PlayerID"];
+        string tourId = data["TournamentID"];
+        int playerNo = data["PlayerNo"];
+        string sRoomId = data["RoomId"];
+        int code = data["EventCode"];
+        float posX = data["SliderAngleX"];
+        float posY = data["SliderAngleY"];
+        float posZ = data["SliderAngleZ"];
+        
+        
+        if (DataManager.Instance.playerData._id == playerId) return;
+        if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
+        {
+            Vector3 strikerAngel = new Vector3(posX, posY, posZ);
+            GameManager.Instance.SpawnBalls(new Vector3[] { strikerAngel });
+        }
+    }
+    
+    private void BallMovement(string values)
+    {
+        if (SceneManager.GetActiveScene().name != "Pool") return;
+        JSONNode value = JSON.Parse(values);
+        JSONNode data = JSON.Parse(value["data"].ToString());
+        string playerId = data["PlayerID"];
+        string tourId = data["TournamentID"];
+        int playerNo = data["PlayerNo"];
+        string sRoomId = data["RoomId"];
+        int code = data["EventCode"];
+        float posX = data["SliderAngleX"];
+        float posY = data["SliderAngleY"];
+        float posZ = data["SliderAngleZ"];
+        
+        
+        if (DataManager.Instance.playerData._id == playerId) return;
+        if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
+        {
+            Vector3 strikerAngel = new Vector3(posX, posY, posZ);
+            CueController.Instance.BallMovement(strikerAngel);
+        }
+    }
+    
+    private void CueRotation(string values)
+    {
+        if (SceneManager.GetActiveScene().name != "Pool") return;
+        JSONNode value = JSON.Parse(values);
+        JSONNode data = JSON.Parse(value["data"].ToString());
+        string playerId = data["PlayerID"];
+        string tourId = data["TournamentID"];
+        int playerNo = data["PlayerNo"];
+        string sRoomId = data["RoomId"];
+        int code = data["EventCode"];
+        float rotX = data["RotationX"];
+        float rotY = data["RotationY"];
+        float rotZ = data["RotationZ"];
+        float rotW = data["RotationW"];
+        
+        
+        if (DataManager.Instance.playerData._id == playerId) return;
+        if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
+        {
+            Quaternion angel = new Quaternion(rotX, rotY, rotZ, rotW);
+            CueController.Instance.CueRotation(angel);
+        }
+    }
+    
+    private void CueSpin(string values)
+    {
+        if (SceneManager.GetActiveScene().name != "Pool") return;
+        JSONNode value = JSON.Parse(values);
+        JSONNode data = JSON.Parse(value["data"].ToString());
+        string playerId = data["PlayerID"];
+        string tourId = data["TournamentID"];
+        int playerNo = data["PlayerNo"];
+        string sRoomId = data["RoomId"];
+        int code = data["EventCode"];
+        float posX = data["SliderAngleX"];
+        float posY = data["SliderAngleY"];
+        float posZ = data["SliderAngleZ"];
+        
+        
+        if (DataManager.Instance.playerData._id == playerId) return;
+        if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
+        {
+            Vector3 strikerAngel = new Vector3(posX, posY, posZ);
+            CueController.Instance.CueSpin(strikerAngel);
+        }
+    }
+    
+    private void SwitchUser(string values)
+    {
+        if (SceneManager.GetActiveScene().name != "Pool") return;
+        JSONNode value = JSON.Parse(values);
+        JSONNode data = JSON.Parse(value["data"].ToString());
+        string playerId = data["PlayerID"];
+        string tourId = data["TournamentID"];
+        int playerNo = data["PlayerNo"];
+        string sRoomId = data["RoomId"];
+        int code = data["EventCode"];
+        float posX = data["SliderAngleX"];
+        float posY = data["SliderAngleY"];
+        float posZ = data["SliderAngleZ"];
+        
+        
+        if (DataManager.Instance.playerData._id == playerId) return;
+        if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
+        {
+            Vector3 strikerAngel = new Vector3(posX, posY, posZ);
+            CueController.Instance.SwitchUser(code, strikerAngel);
+        }
+    }
+    
+    private void PotEvent(string values)
+    {
+        if (SceneManager.GetActiveScene().name != "Pool") return;
+        JSONNode value = JSON.Parse(values);
+        JSONNode data = JSON.Parse(value["data"].ToString());
+        string playerId = data["PlayerID"];
+        string tourId = data["TournamentID"];
+        int playerNo = data["PlayerNo"];
+        string sRoomId = data["RoomId"];
+        int num = data["PotNumber"];
+        
+        if (DataManager.Instance.playerData._id == playerId) return;
+        if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
+        {
+            CueController.Instance.PotNumber(num);
+        }
+    }
+    
+    private void ShotPower(string values)
+    {
+        if (SceneManager.GetActiveScene().name != "Pool") return;
+        JSONNode value = JSON.Parse(values);
+        JSONNode data = JSON.Parse(value["data"].ToString());
+        string playerId = data["PlayerID"];
+        string tourId = data["TournamentID"];
+        int playerNo = data["PlayerNo"];
+        string sRoomId = data["RoomId"];
+        int code = data["EventCode"];
+        float posX = data["SliderAngleX"];
+        float posY = data["SliderAngleY"];
+        float posZ = data["SliderAngleZ"];
+        
+        
+        if (DataManager.Instance.playerData._id == playerId) return;
+        if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
+        {
+            Vector3 power = new Vector3(posX, posY, posZ);
+            CueController.Instance.Power(power);
+        }
+    }
+
+    private void BallTrigger(string values)
+    {
+        if (SceneManager.GetActiveScene().name != "Pool") return;
+        JSONNode value = JSON.Parse(values);
+        JSONNode data = JSON.Parse(value["data"].ToString());
+        string playerId = data["PlayerID"];
+        string tourId = data["TournamentID"];
+        int playerNo = data["PlayerNo"];
+        string sRoomId = data["RoomId"];
+        int code = data["EventCode"];
+        
+        if (DataManager.Instance.playerData._id == playerId) return;
+        if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
+        {
+            JSONArray ballArray = data["BallData"].AsArray;
+            Vector3[] receivedBallData = new Vector3[ballArray.Count];
+
+            for (int i = 0; i < ballArray.Count; i++)
+            {
+                JSONNode ballNode = ballArray[i];
+                float x = ballNode["x"].AsFloat;
+                float y = ballNode["y"].AsFloat;
+                float z = ballNode["z"].AsFloat;
+                receivedBallData[i] = new Vector3(x, y, z);
+            }
+
+            CueController.Instance.Trigger(code, receivedBallData);
+        }
+    }
+
+    private void SetMessage(string values)
+    {
+        if (SceneManager.GetActiveScene().name != "Pool") return;
+        JSONNode value = JSON.Parse(values);
+        JSONNode data = JSON.Parse(value["data"].ToString());
+        string playerId = data["PlayerID"];
+        string tourId = data["TournamentID"];
+        int playerNo = data["PlayerNo"];
+        string sRoomId = data["RoomId"];
+        int code = data["EventCode"];
+        string message = data["Message"];
+        
+        if (DataManager.Instance.playerData._id == playerId) return;
+        if (tourId == DataManager.Instance.tournamentID && sRoomId == roomid && playerNo != DataManager.Instance.playerNo)
+        {
+            CueController.Instance.FaultMessage(message);
+        }
+    }
 
     #endregion
 

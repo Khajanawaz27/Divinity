@@ -170,12 +170,17 @@ public class SpawnBallsScript : MonoBehaviour {
 
         GameManager.Instance.balls = balls;
 
-        if (GameManager.Instance.roomOwner) {
+        if (GameManager.Instance.roomOwner) 
+        {
             Debug.Log("Raise 198");
             /*if (!GameManager.Instance.offlineMode)
                 //PhotonNetwork.RaiseEvent(198, positions, true, null);*/
-        } else {
-            for (int i = 0; i < GameManager.Instance.initPositions.Length; i++) {
+            PoolSocketManager.Instance.SpawnBalls(198, positions);
+        } 
+        else 
+        {
+            for (int i = 0; i < GameManager.Instance.initPositions.Length; i++) 
+            {
                 GameManager.Instance.balls[i + 1].GetComponent<Rigidbody>().transform.position = GameManager.Instance.initPositions[i];
                 GameManager.Instance.balls[i + 1].SetActive(true);
             }
@@ -205,6 +210,7 @@ public class SpawnBallsScript : MonoBehaviour {
                 Debug.Log("Raise event 10");
                 cueControllerScript.opponentShotStart = false;
                 if (!GameManager.Instance.offlineMode)
+                    PoolSocketManager.Instance.WinningIsCalled(10);
                    // PhotonNetwork.RaiseEvent(10, null, true, null);
 
                 updatesCount = 0;
@@ -264,6 +270,7 @@ public class SpawnBallsScript : MonoBehaviour {
                         //cueControllerScript.isServer = false;
                         /*if (!GameManager.Instance.offlineMode)
                             PhotonNetwork.RaiseEvent(6, data, true, null);*/
+                        PoolSocketManager.Instance.TriggerBall(6, data);
                         dd.Clear();
 
                         if (GameManager.Instance.offlineMode) {
@@ -281,20 +288,27 @@ public class SpawnBallsScript : MonoBehaviour {
         //cueControllerScript.targetLine.SetActive (true);
 
 
-        if (GameManager.Instance.wasFault) {
+        if (GameManager.Instance.wasFault) 
+        {
             Debug.Log("Raise 9");
-            if (GameManager.Instance.faultMessage.Length > 0) {
+            if (GameManager.Instance.faultMessage.Length > 0) 
+            {
                 GameManager.Instance.gameControllerScript.showMessage(GameManager.Instance.faultMessage);
                 /*if (!GameManager.Instance.offlineMode)
                     PhotonNetwork.RaiseEvent(13, GameManager.Instance.faultMessage, true, null);*/
+                PoolSocketManager.Instance.SendMessage(13, GameManager.Instance.faultMessage);
             }
             /*if (!GameManager.Instance.offlineMode)
                 PhotonNetwork.RaiseEvent(9, cueControllerScript.cue.transform.position, true, null);*/
+            PoolSocketManager.Instance.SwitchUser(9, cueControllerScript.cue.transform.position);
             GameManager.Instance.faultMessage = "";
-        } else {
+        } 
+        else 
+        {
             Debug.Log("Raise 12");
             /*if (!GameManager.Instance.offlineMode)
                 PhotonNetwork.RaiseEvent(12, cueControllerScript.cue.transform.position, true, null);*/
+            PoolSocketManager.Instance.SwitchUser(12, cueControllerScript.cue.transform.position);
         }
 
 
@@ -328,6 +342,7 @@ public class SpawnBallsScript : MonoBehaviour {
         }
         /*if (!GameManager.Instance.offlineMode)
             PhotonNetwork.RaiseEvent(5, data, true, null);*/
+        PoolSocketManager.Instance.TriggerBall(5, data);
     }
 
 }

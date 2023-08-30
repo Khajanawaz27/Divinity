@@ -150,6 +150,7 @@ public class SpinController : MonoBehaviour {
 
                 /*if (!GameManager.Instance.offlineMode)
                     PhotonNetwork.RaiseEvent(11, circle2.transform.localPosition, true, null);*/
+                PoolSocketManager.Instance.CueSpinController(11, circle2.transform.localPosition);
 
 
                 Vector3 offsetSpin = circle2.transform.localPosition - initialPosStart;

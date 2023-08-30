@@ -129,9 +129,9 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
 
     [SerializeField] private OfflinePlayer playingPlayer;
 
-    private OfflineStrikerAnimator playerStrikerAnimator;
+    public OfflineStrikerAnimator playerStrikerAnimator;
 
-    private OfflineStrikerAnimator opponentStrikerAnimator;
+    public OfflineStrikerAnimator opponentStrikerAnimator;
 
     public bool isPlayerTurn = true;
 
@@ -189,6 +189,7 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
 
     private void Start()
     {
+        SoundManager.Instance.StopBackgroundMusic();
         downStrikerMover = strikerMoverDown.GetComponent<StrikerMover>();
         upStrikerMover = strikerMoverUp.GetComponent<StrikerMover>();
         strikerMoverUpRender = strikerMoverUp.GetComponent<SpriteRenderer>();
@@ -238,12 +239,14 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
     public void StartGame()
     {
         InstantiatePucks();
-        InstantiateOpponetStriker();
-        BeginGame(0);
+        //InstantiateOpponetStriker();
+        InstantiatePlayerStriker();
+        BeginGame(CarromSocketManager.Instance.GetCurrentPlayerNo());
         //PlayerTurn();
         AudioManager.getInstance().PlaySound(AudioManager.PLAY_PLAYER_TURN);
         ManageSoundButtons();
         PlayerNameManage();
+        ChangePos();
     }
 
 
@@ -255,7 +258,7 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
         foreach (CarromCoin carromCoin in array)
         {
             gameObject = Object.Instantiate(carromCoin.prefab, carromCoin.prefab.transform.position, Quaternion.identity);
-            gameObject.name = gameObject.name + CarromSocketManager.Instance.posListOrg.Count;
+            // gameObject.name = gameObject.name + Carrom_SocketController.instance.posListOrg.Count;
             PuckColor component = gameObject.GetComponent<PuckColor>();
             allPuck.Add(gameObject);
 
@@ -276,8 +279,8 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
             pucks.Add(new Puck(gameObject.GetComponent<Rigidbody2D>(), component));
         }
         gameObject = playerStriker;
-        ChangePos();
-        playerStriker.GetComponent<SpriteRenderer>().sprite = LevelManager.instance.strikers[PlayerPrefs.GetInt("striker", 0)];
+        //ChangePos();
+        // playerStriker.GetComponent<SpriteRenderer>().sprite = LevelManager.instance.strikers[PlayerPrefs.GetInt("striker", 0)];
         playerStrikerAnimator = gameObject.GetComponent<OfflineStrikerAnimator>();
         SetStrikerAnimator(playerStrikerAnimator);
         gameObject.GetComponent<CircleCollider2D>().enabled = true;
@@ -317,44 +320,41 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
 
     void ChangePos()
     {
-        if (DataManager.Instance.playerNo == 2)
+        if (CarromSocketManager.Instance.GetCurrentPlayerNo() != 2) return;
+        foreach (GameObject gameObject in allPuck)
         {
+            print("gameObject Name : " + gameObject.name);
+            float posY = gameObject.transform.position.y;
+            float posX = gameObject.transform.position.x;
 
-            foreach (GameObject gameObject in allPuck)
+            CarromSocketManager.Instance.posListOrg.Add(posY);
+            if (posY < 0)
             {
-                print("gameObject Name : " + gameObject.name);
-                float posY = gameObject.transform.position.y;
-                float posX = gameObject.transform.position.x;
+                posY = Mathf.Abs(posY);
 
-                //CarromSocketManager.Instance.posListOrg.Add(posY);
-                if (posY < 0)
-                {
-                    posY = Mathf.Abs(posY);
-
-                    print("posX : " + posY);
-                }
-                else
-                {
-                    posY = -posY;
-                    print("posX : " + posY);
-                }
-
-                if (posX < 0)
-                {
-                    posX = Mathf.Abs(posX);
-
-                    print("posX : " + posX);
-                }
-                else
-                {
-                    posX = -posX;
-                    print("posX : " + posX);
-                }
-
-                //CarromSocketManager.Instance.posList.Add(posY);
-                Vector3 updatePos = new Vector3(posX, posY, gameObject.transform.position.z);
-                gameObject.transform.position = updatePos;
+                print("posX : " + posY);
             }
+            else
+            {
+                posY = -posY;
+                print("posX : " + posY);
+            }
+
+            if (posX < 0)
+            {
+                posX = Mathf.Abs(posX);
+
+                print("posX : " + posX);
+            }
+            else
+            {
+                posX = -posX;
+                print("posX : " + posX);
+            }
+
+            CarromSocketManager.Instance.posList.Add(posY);
+            Vector3 updatePos = new Vector3(posX, posY, gameObject.transform.position.z);
+            gameObject.transform.position = updatePos;
         }
     }
 
@@ -368,10 +368,21 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
         SetOpponentStrikerAnimator(opponentStrikerAnimator);
         upStrikerMover.SetStriker(gameObject, PlayerPrefs.GetInt("striker"));
     }
-
-    private void BeginGame(int playetToPlay)
+    
+    private void InstantiatePlayerStriker()
     {
-        if (playetToPlay == 0)
+        //GameObject gameObject = opponentStriker;
+        GameObject gameObject = playerStriker;
+        //opponentStriker.GetComponent<SpriteRenderer>().sprite = LevelManager.instance.strikers[PlayerPrefs.GetInt("striker", 0)];
+        gameObject.GetComponent<CircleCollider2D>().enabled = true;
+        playerStrikerAnimator = gameObject.GetComponent<OfflineStrikerAnimator>();
+        SetStrikerAnimator(playerStrikerAnimator);
+        upStrikerMover.SetStriker(gameObject, PlayerPrefs.GetInt("striker"));
+    }
+
+    private void BeginGame(int currentPlayerNumber)
+    {
+        /*if (playetToPlay == 0)
         {
             PuckColor.Color color = ((playetToPlay == 0) ? PuckColor.Color.WHITE : PuckColor.Color.BLACK);
             currentLoader = ((playetToPlay != 0) ? opponentLoader : playerLoader);
@@ -380,15 +391,36 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
             PuckColor.Color color2 = ((color != PuckColor.Color.WHITE) ? PuckColor.Color.WHITE : PuckColor.Color.BLACK);
             player = new OfflinePlayer(color);
             opponentPlayer = new OfflinePlayer(color2);
+            
+            if (CarromSocketManager.Instance.GetCurrentPlayerNo() == 1)
+            {
+                //on
+                playingPlayer = player;
+                //currentLoader = playerLoader;
 
-            if (DataManager.Instance.playerNo == 1)
+                Debug.Log("Check Player 1");
+                playerStrikerAnimator.MoveStrikerIn();// for player striker to instantiate
+                //opponentStrikerAnimator.MoveStrikerIn();// fo opponent strikefr to instantiate
+            }
+            else if (CarromSocketManager.Instance.GetCurrentPlayerNo() == 2)
+            {
+                //on
+                Debug.Log("Check Player 2");
+
+                playingPlayer = opponentPlayer;
+                //currentLoader = opponentLoader;
+                opponentStrikerAnimator.MoveStrikerIn();
+            }
+            EnableStrikerHandler();
+
+            /*if (DataManager.Instance.playerNo == 1)
             {
                 playingPlayer = player;
             }
             else
             {
                 playingPlayer = opponentPlayer;
-            }
+            }#1#
             playerScoreView = leftScoreView;
             opponentScoreView = rightScoreView;
             movementPadBottom.SetActive(true);
@@ -396,7 +428,49 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
         playerCoin.enabled = true;
         opponentCoin.enabled = true;
         /*playerNameView.text = "Player 1";
-        opponentNameView.text = "Player 2";*/
+        opponentNameView.text = "Player 2";#1#*/
+        
+        // Assuming player number 1 is WHITE and player number 2 is BLACK
+        PuckColor.Color color = (currentPlayerNumber == 1) ? PuckColor.Color.WHITE : PuckColor.Color.BLACK;
+        currentLoader = (currentPlayerNumber == 1) ? playerLoader : opponentLoader;
+
+        playerCoin.sprite = (color == PuckColor.Color.WHITE) ? whiteCoin : blackCoin;
+        opponentCoin.sprite = (color == PuckColor.Color.WHITE) ? blackCoin : whiteCoin;
+
+        PuckColor.Color opponentColor = (color == PuckColor.Color.WHITE) ? PuckColor.Color.BLACK : PuckColor.Color.WHITE;
+
+        player = new OfflinePlayer(color);
+        opponentPlayer = new OfflinePlayer(opponentColor);
+
+        if (CarromSocketManager.Instance.GetCurrentPlayerNo() == currentPlayerNumber)
+        {
+            playingPlayer = (currentPlayerNumber == 1) ? player : opponentPlayer;
+            playerStrikerAnimator.MoveStrikerIn();
+            //opponentStrikerAnimator.MoveStrikerIn();
+        }
+        else
+        {
+            playingPlayer = (currentPlayerNumber == 1) ? opponentPlayer : player;
+            opponentStrikerAnimator.MoveStrikerIn();
+        }
+
+        EnableStrikerHandler();
+
+        if (DataManager.Instance.playerNo == 1)
+        {
+            playerScoreView = leftScoreView;
+            opponentScoreView = rightScoreView;
+        }
+        else
+        {
+            playerScoreView = rightScoreView;
+            opponentScoreView = leftScoreView;
+        }
+
+        movementPadBottom.SetActive(true);
+
+        playerCoin.enabled = true;
+        opponentCoin.enabled = true;
     }
 
     public void PlayerTurn()
@@ -413,12 +487,22 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
 
 
         //}
-        if (player == playingPlayer)
+        /*if (player == playingPlayer)
         {
             playerStrikerAnimator.MoveStrikerIn();
         }
         else
         {
+            opponentStrikerAnimator.MoveStrikerIn();
+        }*/
+        if (player == playingPlayer)
+        {
+            playerStrikerAnimator.MoveStrikerIn();
+            opponentStrikerAnimator.MoveStrikerOut();
+        }
+        else
+        {
+            playerStrikerAnimator.MoveStrikerOut();
             opponentStrikerAnimator.MoveStrikerIn();
         }
         AudioManager.getInstance().PlaySound(AudioManager.PLAY_PLAYER_TURN);
@@ -439,6 +523,7 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
 
     private void HandleOwnerShip()
     {
+        //playingPlayer = ((playingPlayer != player) ? player : opponentPlayer);
         playingPlayer = ((playingPlayer != player) ? player : opponentPlayer);
     }
 
@@ -651,7 +736,7 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
             if (!IsGameOver())
             {
                 goaledColors.Clear();
-                Invoke("NextPlayerTurn", 2f);
+                //Invoke(nameof(NextPlayerTurn), 2f);
                 Invoke(nameof(SendTurnByUser), 2f);
             }
             return;
@@ -733,8 +818,8 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
                 {
                     RespawnQueen();
                 }
-                Invoke("NextPlayerTurn", 2f);
                 Invoke(nameof(SendTurnByUser), 2f);
+                //Invoke(nameof(NextPlayerTurn), 2f);
             }
             if (IsGameOver())
             {
@@ -745,12 +830,12 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
         {
             RespawnQueen();
             Invoke(nameof(SendTurnByUser), 2f);
-            Invoke("NextPlayerTurn", 2f);
+            //Invoke(nameof(NextPlayerTurn), 2f);
         }
         else
         {
             Invoke(nameof(SendTurnByUser), 2f);
-            Invoke("NextPlayerTurn", delay);
+            //Invoke(nameof(NextPlayerTurn), 2f);;
         }
         goaledColors.Clear();
     }
@@ -832,21 +917,21 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
     
     public void SendTurnByUser()
     {
-        //CarromSocketManager.Instance.SendCarromTurn();
+        CarromSocketManager.Instance.SendCarromTurn();
     }
 
     public void NextPlayerTurn()
     {
         disableStrikerMover();
         strikedAnyPucks = false;
-        if (playingPlayer == player)
+        /*if (playingPlayer == player)
         {
             playerStrikerAnimator.MoveStrikerOut();
         }
         else
         {
             opponentStrikerAnimator.MoveStrikerOut();
-        }
+        }*/
         MoveStrikerHandlerToCenter();
         HandleOwnerShip();
         PlayerTurn();
@@ -973,6 +1058,7 @@ public class OfflineGameManager : MonoBehaviour//, IPunTurnManagerCallbacks
     private void GoBackToMenu()
     {
         AudioManager.getInstance().StopSound(AudioManager.PLAY_TICK);
+        SoundManager.Instance.StartBackgroundMusic();
         SceneManager.LoadScene("Main");
     }
 

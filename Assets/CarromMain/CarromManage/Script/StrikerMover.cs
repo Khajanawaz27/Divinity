@@ -113,7 +113,7 @@ public class StrikerMover : MonoBehaviour
                 if (beforeVector != vector)
                 {
                     beforeVector = vector;
-                    CarromSocketManager.Instance.SendCarromStrikeMove(vector.x);
+                    CarromSocketManager.Instance.SendCarromStrikeMove(vector.x, DataManager.Instance.playerNo);
                     print("Greejesh Strik Slider");
                 }
                 vector.y = strikerPosition.position.y;

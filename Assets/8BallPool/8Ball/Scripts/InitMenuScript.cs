@@ -48,8 +48,8 @@ public class InitMenuScript : MonoBehaviour {
 
         GameManager.Instance.coinsTextMenu = coinsText;
         GameManager.Instance.coinsTextShop = coinsTextShop;
-        GameManager.Instance.playfabManager.updateCoinsTextMenu();
-        GameManager.Instance.playfabManager.updateCoinsTextShop();
+        //GameManager.Instance.playfabManager.updateCoinsTextMenu();
+        //GameManager.Instance.playfabManager.updateCoinsTextShop();
         GameManager.Instance.initMenuScript = this;
 
         if (StaticStrings.hideCoinsTabInShop) {
@@ -92,11 +92,11 @@ public class InitMenuScript : MonoBehaviour {
         GameManager.Instance.tableNumber = 0;
         GameManager.Instance.offlineMode = true;
         GameManager.Instance.roomOwner = true;
-        SceneManager.LoadScene("GameScene");
+        SceneManager.LoadScene("Pool");
     }
 
     public void switchUser() {
-        GameManager.Instance.playfabManager.destroy();
+        //GameManager.Instance.playfabManager.destroy();
         //GameManager.Instance.facebookManager.destroy();
         GameManager.Instance.connectionLost.destroy();
         //GameManager.Instance.adsScript.destroy();

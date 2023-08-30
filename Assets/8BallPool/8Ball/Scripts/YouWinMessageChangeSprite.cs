@@ -24,7 +24,7 @@ public class YouWinMessageChangeSprite : MonoBehaviour {
 
     public void loadWinnerScene() {
         if (GameManager.Instance.offlineMode) {
-            GameManager.Instance.playfabManager.roomOwner = false;
+            //GameManager.Instance.playfabManager.roomOwner = false;
             GameManager.Instance.roomOwner = false;
             GameManager.Instance.resetAllData();
             SceneManager.LoadScene("Menu");

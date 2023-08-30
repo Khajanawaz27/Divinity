@@ -31,5 +31,6 @@ public class CallPocketButtonController : MonoBehaviour {
         }
         /*if (!GameManager.Instance.offlineMode)
             PhotonNetwork.RaiseEvent(22, potNumber - 1, true, null);*/
+        PoolSocketManager.Instance.CallPocket(22, potNumber - 1);
     }
 }

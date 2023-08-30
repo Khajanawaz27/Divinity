@@ -77,7 +77,7 @@ public class GameManager {
     public CueController cueController;
     public GameObject friendButtonMenu;
     public GameObject smallMenu;
-    public PlayFabManager playfabManager;
+    //public PlayFabManager playfabManager;
     public float messageTime = 0;
 
     public int tableNumber = 0;
@@ -151,5 +151,20 @@ public class GameManager {
     public void resetTurnVariables() {
         stopTimer = false;
     }
+
+
+    #region SocketReceving
+
+    public void SpawnBalls(Vector3[] pos)
+    {
+        Debug.Log("Received 198");
+        initPositions = pos;
+
+        if (initPositions == null) Debug.Log("null pos");
+        else Debug.Log("not null pos");
+        receivedInitPositions = true;
+    }
+
+    #endregion
 
 }

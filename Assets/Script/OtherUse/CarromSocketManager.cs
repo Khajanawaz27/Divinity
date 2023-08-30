@@ -21,6 +21,8 @@ public class CarromSocketManager : MonoBehaviour
 
     public List<float> posList = new List<float>();
     public List<float> posListOrg = new List<float>();
+    
+    
     private void Awake()
     {
         if (Instance == null)
@@ -56,6 +58,11 @@ public class CarromSocketManager : MonoBehaviour
     {
 
     }
+    
+    public int GetCurrentPlayerNo()
+    {
+        return DataManager.Instance.playerNo;
+    }
 
     #region Send Socket
 
@@ -69,12 +76,12 @@ public class CarromSocketManager : MonoBehaviour
         TestSocketIO.Instace.Senddata("CarromTurn", obj);
     }
 
-    public void SendCarromStrikeMove(float posX)
+    public void SendCarromStrikeMove(float posX, int playerNo)
     {
         JSONObject obj = new JSONObject();
         obj.AddField("PlayerID", DataManager.Instance.playerData._id);
         obj.AddField("TournamentID", DataManager.Instance.tournamentID);
-        obj.AddField("PlayerNo", DataManager.Instance.playerNo);
+        obj.AddField("PlayerNo", playerNo);
         obj.AddField("SliderPos", posX);
         obj.AddField("RoomId", TestSocketIO.Instace.roomid);
         TestSocketIO.Instace.Senddata("CarromStrikeMove", obj);

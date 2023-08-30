@@ -59,15 +59,15 @@ public class CueShopController : MonoBehaviour {
 
     public void buyCue() {
         if (own) {
-            GameManager.Instance.playfabManager.setUsedCue(this.index, this.additionalPower, this.additionalAim, this.additionalTime);
+            //GameManager.Instance.playfabManager.setUsedCue(this.index, this.additionalPower, this.additionalAim, this.additionalTime);
             GameManager.Instance.usingCueText.GetComponent<Text>().text = "Use";
             GameManager.Instance.usingCueText = buttonText;
             buttonText.GetComponent<Text>().text = "Using";
 
         } else {
             if (GameManager.Instance.coinsCount >= this.price) {
-                GameManager.Instance.playfabManager.addCoinsRequest(-this.price);
-                GameManager.Instance.playfabManager.updateBoughtCues(this.index);
+                //GameManager.Instance.playfabManager.addCoinsRequest(-this.price);
+                //GameManager.Instance.playfabManager.updateBoughtCues(this.index);
                 button.GetComponent<Image>().sprite = blueSprite;
                 buttonText.GetComponent<Text>().text = "Use";
                 own = true;

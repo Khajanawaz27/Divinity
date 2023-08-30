@@ -80,7 +80,7 @@ public class PlayFabManager : MonoBehaviour
         PhotonAppID = StaticStrings.PhotonAppID;
         PhotonChatID = StaticStrings.PhotonChatID;
 
-        GameManager.Instance.playfabManager = this;
+        //GameManager.Instance.playfabManager = this;
 
         //fbManager = GameObject.Find("FacebookManager").GetComponent<FacebookManager>();
         //facebookFriendsMenu = GameManager.Instance.facebookFriendsMenu;//fbButton.GetComponent <FacebookFriendsMenu> ();
@@ -149,7 +149,7 @@ public class PlayFabManager : MonoBehaviour
     public void startGameScene()
     {
 
-        SceneManager.LoadScene("GameScene");
+        SceneManager.LoadScene("Pool");
     }
     
 
@@ -1326,7 +1326,7 @@ public class PlayFabManager : MonoBehaviour
 
     public void switchUser() {
         //if(GameManager.Instance.playfabManager != null)
-            GameManager.Instance.playfabManager.destroy();
+           // GameManager.Instance.playfabManager.destroy();
         //if(GameManager.Instance.facebookManager != null)    
            // GameManager.Instance.facebookManager.destroy();
         //if(GameManager.Instance.connectionLost != null)

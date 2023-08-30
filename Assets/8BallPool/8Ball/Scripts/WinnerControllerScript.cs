@@ -80,7 +80,7 @@ public class WinnerControllerScript : MonoBehaviour {
             if (GameManager.Instance.iWon) {
                 myObject.GetComponent<Animator>().Play("WinnerOpponentAnimation");
                 audioSources[0].Play();
-                GameManager.Instance.playfabManager.addCoinsRequest(GameManager.Instance.payoutCoins * 2);
+                //GameManager.Instance.playfabManager.addCoinsRequest(GameManager.Instance.payoutCoins * 2);
             } else {
                 opponentObject.GetComponent<Animator>().Play("WinnerOpponentAnimation");
                 audioSources[1].Play();
@@ -222,7 +222,7 @@ public class WinnerControllerScript : MonoBehaviour {
         GameManager.Instance.cueController.removeOnEventCall();
         //PhotonNetwork.LeaveRoom();
 
-        GameManager.Instance.playfabManager.roomOwner = false;
+        //GameManager.Instance.playfabManager.roomOwner = false;
         GameManager.Instance.roomOwner = false;
         GameManager.Instance.resetAllData();
 
@@ -243,7 +243,7 @@ public class WinnerControllerScript : MonoBehaviour {
                 //PhotonNetwork.RaiseEvent(195, 1, true, null);
             rematchButton.SetActive(false);
             GameManager.Instance.resetAllData();
-            SceneManager.LoadScene("GameScene");
+            SceneManager.LoadScene("Pool");
             removeOnEventCall();
         }
     }

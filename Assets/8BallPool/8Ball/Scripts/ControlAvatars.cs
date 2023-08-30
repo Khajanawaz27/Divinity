@@ -468,7 +468,7 @@ public class ControlAvatars : MonoBehaviour {
             playerDisconnected();
         }*/
 
-        SceneManager.LoadScene ("GameScene");
+        SceneManager.LoadScene ("Pool");
         reset ();
     }
 
@@ -520,7 +520,7 @@ public class ControlAvatars : MonoBehaviour {
             matchPlayersCanvas.SetActive(false);
             //PhotonNetwork.BackgroundTimeout = 0;
             Debug.Log("Timeout 2");
-            GameManager.Instance.playfabManager.imReady = false;
+            //GameManager.Instance.playfabManager.imReady = false;
             //GameObject.Find ("PlayFabManager").GetComponent <PlayFabManager> ().imReady = false;
         }
     }

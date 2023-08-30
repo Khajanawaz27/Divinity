@@ -20,13 +20,13 @@ public class GameControllerScript : MonoBehaviour
     public GameObject menuScreenObj;
     public GameObject settingsScreenObj;
 
-    private Image imageClock1;
-    private Image imageClock2;
+    public Image imageClock1;
+    public Image imageClock2;
 
-    private Animator messageBubble;
-    private Text messageBubbleText;
+    public Animator messageBubble;
+    public Text messageBubbleText;
 
-    private int currentImage = 1;
+    private int currentPlayer;
 
     public float playerTime;
 
@@ -49,13 +49,23 @@ public class GameControllerScript : MonoBehaviour
         shotPowerScript = shotPowerObject.GetComponent<ShotPowerScript>();
         cueControllerScript = cueController.GetComponent<CueController>();
         playerTime = GameManager.Instance.playerTime;
-        imageClock1 = GameObject.Find("AvatarClock1").GetComponent<Image>();
-        imageClock2 = GameObject.Find("AvatarClock2").GetComponent<Image>();
+        GameObject.Find("Name1").GetComponent<Text>().text = GameManager.Instance.nameMy;
+        if (GameManager.Instance.avatarMy != null)
+        {
+            GameObject.Find("Avatar1").GetComponent<Image>().sprite = GameManager.Instance.avatarMy;
+        }
+        GameObject.Find("Name2").GetComponent<Text>().text = GameManager.Instance.nameOpponent;
+        if (GameManager.Instance.avatarOpponent != null)
+        {
+            GameObject.Find("Avatar2").GetComponent<Image>().sprite = GameManager.Instance.avatarOpponent;
+        }
+        /*//imageClock1 = GameObject.Find("AvatarClock1").GetComponent<Image>();
+        //imageClock2 = GameObject.Find("AvatarClock2").GetComponent<Image>();
 
-        messageBubble = GameObject.Find("MessageBubble").GetComponent<Animator>();
-        messageBubbleText = GameObject.Find("BubbleText").GetComponent<Text>();
+        //messageBubble = GameObject.Find("MessageBubble").GetComponent<Animator>();
+        //messageBubbleText = GameObject.Find("BubbleText").GetComponent<Text>();
 
-        if (GameManager.Instance.offlineMode) {
+        /*if (GameManager.Instance.offlineMode) {
             GameObject.Find("Name1").GetComponent<Text>().text = StaticStrings.offlineModePlayer1Name;
             // if (GameManager.Instance.avatarMy != null)
             //     GameObject.Find("Avatar1").GetComponent<Image>().sprite = GameManager.Instance.avatarMy;
@@ -65,16 +75,8 @@ public class GameControllerScript : MonoBehaviour
 
             // if (GameManager.Instance.avatarOpponent != null)
             //     GameObject.Find("Avatar2").GetComponent<Image>().sprite = GameManager.Instance.avatarOpponent;
-        } else {
-            GameObject.Find("Name1").GetComponent<Text>().text = GameManager.Instance.nameMy;
-            if (GameManager.Instance.avatarMy != null)
-                GameObject.Find("Avatar1").GetComponent<Image>().sprite = GameManager.Instance.avatarMy;
-
-            GameObject.Find("Name2").GetComponent<Text>().text = GameManager.Instance.nameOpponent;
-
-            if (GameManager.Instance.avatarOpponent != null)
-                GameObject.Find("Avatar2").GetComponent<Image>().sprite = GameManager.Instance.avatarOpponent;
-        }
+        } else {#1#
+        //}
 
         // GameObject.Find ("Name1").GetComponent <Text> ().text = GameManager.Instance.nameMy;
         // if (GameManager.Instance.avatarMy != null)
@@ -83,23 +85,31 @@ public class GameControllerScript : MonoBehaviour
         // GameObject.Find ("Name2").GetComponent <Text> ().text = GameManager.Instance.nameOpponent;
 
         // if (GameManager.Instance.avatarOpponent != null)
-        //     GameObject.Find ("Avatar2").GetComponent <Image> ().sprite = GameManager.Instance.avatarOpponent;
-
-
-
+        //     GameObject.Find ("Avatar2").GetComponent <Image> ().sprite = GameManager.Instance.avatarOpponent;*/
         PlayerNameManage();
 
         playerTime = playerTime * Time.timeScale;
 
 
-        if (GameManager.Instance.roomOwner) {
+        /*if (GameManager.Instance.roomOwner) {
             showMessage(StaticStrings.youAreBreaking);
         } else {
             showMessage(GameManager.Instance.nameOpponent + " " + StaticStrings.opponentIsBreaking);
-        }
+        }*/
 
-        if (!GameManager.Instance.roomOwner)
-            currentImage = 2;
+            /*if (!GameManager.Instance.roomOwner)
+            currentPlayer = 2;*/
+        switch (DataManager.Instance.playerNo)
+        {
+            case 1:
+                currentPlayer = 1;
+                showMessage(StaticStrings.youAreBreaking);
+                break;
+            case 2:
+                currentPlayer = 2;
+                showMessage(GameManager.Instance.nameOpponent + " " + StaticStrings.opponentIsBreaking);
+                break;
+        }
     }
 
     // Update is called once per frame
@@ -112,7 +122,7 @@ public class GameControllerScript : MonoBehaviour
 
     private void updateClock() {
         float minus;
-        if (currentImage == 1) {
+        if (currentPlayer == 1) {
             playerTime = GameManager.Instance.playerTime;
             if (GameManager.Instance.offlineMode)
                 playerTime = GameManager.Instance.playerTime + GameManager.Instance.cueTime;
@@ -134,6 +144,7 @@ public class GameControllerScript : MonoBehaviour
                 shotPowerScript.resetCue();
                 /*if (!GameManager.Instance.offlineMode)
                     PhotonNetwork.RaiseEvent(9, cueControllerScript.cue.transform.position, true, null);*/
+                PoolSocketManager.Instance.SwitchUser(9, cueControllerScript.cue.transform.position);
                 if(GameManager.Instance.offlineMode) {
                     GameManager.Instance.wasFault = true;
                     GameManager.Instance.cueController.setTurnOffline(true);
@@ -260,7 +271,7 @@ public class GameControllerScript : MonoBehaviour
         imageClock1.fillAmount = 1;
         imageClock2.fillAmount = 1;
 
-        this.currentImage = currentTimer;
+        this.currentPlayer = currentTimer;
 
         if (GameManager.Instance.offlineMode) {
             if (showMessageBool) {
@@ -299,8 +310,10 @@ public class GameControllerScript : MonoBehaviour
         int index2 = DataManager.Instance.playerNo == 2 ? 0 : 1;
         
         playerName.text = UserNameStringManage(DataManager.Instance.joinPlayerDatas[index1].userName);
+        GameManager.Instance.nameMy = playerName.text;
         opponentName.text = UserNameStringManage(DataManager.Instance.joinPlayerDatas[index2].userName);
-
+        GameManager.Instance.nameOpponent = opponentName.text;
+        
         Image img1 = playerImage;
         Image img2 = opponentImage;
         StartCoroutine(DataManager.Instance.GetImages(DataManager.Instance.joinPlayerDatas[index1].avtar, img1));

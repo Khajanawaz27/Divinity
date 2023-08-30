@@ -79,6 +79,8 @@ public class DataManager : MonoBehaviour
     public float chaalLimit;
     public float potLimit;
 
+    [Header("--- Pool ---")] public bool isOfflineGame;
+
 
 
 
@@ -253,10 +255,10 @@ public class DataManager : MonoBehaviour
         else if(type == GameType.Ball_Pool)
         {
             GameManager.Instance.tableNumber = 0;
-            GameManager.Instance.offlineMode = true;
+            GameManager.Instance.offlineMode = isOfflineGame;
             GameManager.Instance.roomOwner = true;
             //SceneManager.LoadScene("GameScene");
-            gameName = "GameScene";
+            gameName = "Pool";
         }
         return gameName;
     }

@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class CueController : MonoBehaviour
 {
 
+    public static CueController Instance { get; private set; }
     public GameObject cue;
     public GameObject posDetector;
 
@@ -15,13 +16,13 @@ public class CueController : MonoBehaviour
 
     private Rigidbody myRigidbody;
     public bool isServer;
-    private LineRenderer lineRenderer;
-    private LineRenderer lineRenderer2;
-    private LineRenderer lineRenderer3;
+    public LineRenderer lineRenderer;
+    public LineRenderer lineRenderer2;
+    public LineRenderer lineRenderer3;
     public GameObject ShotPowerInd;
     public ShotPowerScript ShotPowerIndicator;
     public GameObject targetLine;
-    private GameObject circle;
+    public GameObject circle;
     private RaycastHit hitInfo = new RaycastHit();
     private Ray ray = new Ray();
     public LayerMask layerMask;
@@ -76,33 +77,74 @@ public class CueController : MonoBehaviour
     public GameObject chatButton;
     public bool opponentResumed = false;
     private Vector3 touchMousePos;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject); // Destroy duplicate instances
+        }
+    }
+
     void Start()
     {
 
-
-
-        if(GameManager.Instance.roomOwner) {
+        /*if(GameManager.Instance.roomOwner) 
+        {
             changeCueImage(GameManager.Instance.cueIndex);
-        } else {
+        } 
+        else 
+        {
             changeCueImage(GameManager.Instance.opponentCueIndex);
         }
 
-        if(GameManager.Instance.offlineMode) {
+        if(GameManager.Instance.offlineMode) 
+        {
             chatButton.SetActive(false);
+        }*/
+
+        GameManager.Instance.audioSources = audioController.GetComponents<AudioSource>();
+        audioSources = GetComponents<AudioSource>();
+        switch (DataManager.Instance.playerNo)
+        {
+            case 1:
+            {
+                changeCueImage(GameManager.Instance.cueIndex);
+                // if owner
+                ballHand.SetActive(true);
+                GameManager.Instance.hasCueInHand = true;
+                isServer = true;
+                opponentBallsStoped = true;
+                GameManager.Instance.audioSources[0].Play();
+                break;
+            }
+            case 2:
+            {
+                changeCueImage(GameManager.Instance.opponentCueIndex);
+                isServer = false;
+                break;
+            }
         }
         
 
 
         Debug.Log("Minus Coins");
 
-        
-
-        if(!GameManager.Instance.offlineMode)
-            GameManager.Instance.playfabManager.addCoinsRequest(-GameManager.Instance.payoutCoins);
 
 
-        GameManager.Instance.audioSources = audioController.GetComponents<AudioSource>();
-        audioSources = GetComponents<AudioSource>();
+        if (!GameManager.Instance.offlineMode)
+        {
+            //GameManager.Instance.playfabManager.addCoinsRequest(-GameManager.Instance.payoutCoins);
+            float winAmountFloat = DataManager.Instance.winAmount;
+            int winAmountInt = Mathf.RoundToInt(winAmountFloat); // Convert float to int using rounding
+            //GameManager.Instance.playfabManager.addCoinsRequest(winAmountInt);
+        }
+
+
 
         GameManager.Instance.iWon = false;
         GameManager.Instance.iLost = false;
@@ -110,17 +152,17 @@ public class CueController : MonoBehaviour
 
         SetPrizeText();
 
-        potedBallsGUI = GameObject.Find("PotedBallsGUI").GetComponent<PotedBallsGUIController>();
+        //potedBallsGUI = GameObject.Find("PotedBallsGUI").GetComponent<PotedBallsGUIController>();
         GameManager.Instance.ballHand = ballHand;
         GameManager.Instance.cueController = this;
         ShotPowerIndicator = ShotPowerInd.GetComponent<ShotPowerScript>();
         gameControllerScript = gameControllerObject.GetComponent<GameControllerScript>();
         GameManager.Instance.gameControllerScript = gameControllerScript;
-        circle = GameObject.Find("Circle");
+        /*circle = GameObject.Find("Circle");
         targetLine = GameObject.Find("TargetLine");
         lineRenderer = GameObject.Find("Line").GetComponent<LineRenderer>();
         lineRenderer2 = GameObject.Find("Line2").GetComponent<LineRenderer>();
-        lineRenderer3 = GameObject.Find("Line3").GetComponent<LineRenderer>();
+        lineRenderer3 = GameObject.Find("Line3").GetComponent<LineRenderer>();*/
 
 
         // Configure when target lines will be invisible - table number
@@ -172,19 +214,19 @@ public class CueController : MonoBehaviour
         cueInitialPos.z = cue.transform.position.z;
         cue.transform.position = cueInitialPos;
 
-        isServer = false;
+        //isServer = false;
 
 
 
 
-        if (GameManager.Instance.roomOwner)
+        /*if (GameManager.Instance.roomOwner)
         {
             ballHand.SetActive(true);
             GameManager.Instance.hasCueInHand = true;
             isServer = true;
             opponentBallsStoped = true;
             GameManager.Instance.audioSources[0].Play();
-        }
+        }*/
 
         GameManager.Instance.audioSources[1].Play();
 
@@ -221,6 +263,7 @@ public class CueController : MonoBehaviour
     private void SetPrizeText()
     {
         float prizeCoins = DataManager.Instance.winAmount;
+        prizeText.GetComponent<Text>().text = "₹ " + prizeCoins;
 
         /*if (prizeCoins >= 1000)
         {
@@ -256,24 +299,16 @@ public class CueController : MonoBehaviour
             prizeText.GetComponent<Text>().text = prizeCoins + "";
         }*/
 
-        if(GameManager.Instance.offlineMode) 
+        /*if(GameManager.Instance.offlineMode) 
         {
             prizeText.GetComponent<Text>().text = "Practice";
         }
         else
         {
             prizeText.GetComponent<Text>().text = "₹ " + prizeCoins;
-        }
+        }*/
     }
-
-
-
-
-    void Awake()
-    {
-        //PhotonNetwork.OnEventCall += this.OnEvent;
-
-    }
+    
 
     public void removeOnEventCall()
     {
@@ -473,8 +508,10 @@ public class CueController : MonoBehaviour
 
             byte evCode = 0;
             Vector3[] content = new Vector3[] { shotPower, trickShot };
+            PoolSocketManager.Instance.ShortTurn(evCode, content);
             /*if (!GameManager.Instance.offlineMode)
                 PhotonNetwork.RaiseEvent(evCode, content, true, null);*/
+            //print("ShortData----ev- "+ evCode +" content -- "+ content );
 
             targetLine.SetActive(false);
 
@@ -557,7 +594,7 @@ public class CueController : MonoBehaviour
     }*/
 
     // Multiplayer data received
-    private void OnEvent(byte eventcode, object content, int senderid)
+    public void OnEvent(int eventcode, object content)
     {
 
         Debug.Log("isServer: " + isServer + "  code: " + eventcode);
@@ -690,9 +727,6 @@ public class CueController : MonoBehaviour
         }
         else if (isServer && eventcode == 10)
         { // Opponents balls stoped movement. Can show cue and lines
-
-            
-
             checkShot();
         }
         else if (!isServer && eventcode == 11)
@@ -828,28 +862,17 @@ public class CueController : MonoBehaviour
     public void checkShot() {
         
         if (GameManager.Instance.iWon)
-            {
+        {
 
-                if(!GameManager.Instance.wasFault) {
-                    HideAllControllers();
-                    GameManager.Instance.audioSources[3].Play();
-                    youWonMessage.SetActive(true);
-                    youWonMessage.GetComponent<Animator>().Play("YouWinMessageAnimation");
-                    /*if (!GameManager.Instance.offlineMode)
-                        PhotonNetwork.RaiseEvent(19, null, true, null);*/
-                } else {
-                    HideAllControllers();
-                    GameManager.Instance.audioSources[3].Play();
-                    youWonMessage.SetActive(true);
-                    youWonMessage.GetComponent<YouWinMessageChangeSprite>().changeSprite();
-                    youWonMessage.GetComponent<Animator>().Play("YouWinMessageAnimation");
-                    /*if (!GameManager.Instance.offlineMode)
-                        PhotonNetwork.RaiseEvent(20, null, true, null);*/
-                }
-                
-            }
-            else if (GameManager.Instance.iLost)
-            {
+            if(!GameManager.Instance.wasFault) {
+                HideAllControllers();
+                GameManager.Instance.audioSources[3].Play();
+                youWonMessage.SetActive(true);
+                youWonMessage.GetComponent<Animator>().Play("YouWinMessageAnimation");
+                /*if (!GameManager.Instance.offlineMode)
+                    PhotonNetwork.RaiseEvent(19, null, true, null);*/
+                PoolSocketManager.Instance.WinningIsCalled(19);
+            } else {
                 HideAllControllers();
                 GameManager.Instance.audioSources[3].Play();
                 youWonMessage.SetActive(true);
@@ -857,106 +880,125 @@ public class CueController : MonoBehaviour
                 youWonMessage.GetComponent<Animator>().Play("YouWinMessageAnimation");
                 /*if (!GameManager.Instance.offlineMode)
                     PhotonNetwork.RaiseEvent(20, null, true, null);*/
+                PoolSocketManager.Instance.WinningIsCalled(20);
+            }
+                
+        }
+        else if (GameManager.Instance.iLost)
+        {
+            HideAllControllers();
+            GameManager.Instance.audioSources[3].Play();
+            youWonMessage.SetActive(true);
+            youWonMessage.GetComponent<YouWinMessageChangeSprite>().changeSprite();
+            youWonMessage.GetComponent<Animator>().Play("YouWinMessageAnimation");
+            /*if (!GameManager.Instance.offlineMode)
+                PhotonNetwork.RaiseEvent(20, null, true, null);*/
+            PoolSocketManager.Instance.WinningIsCalled(20);
+        }
+        else
+        {
+            bool changedWhitePos = false;
+
+
+
+
+            if (!GameManager.Instance.ballsStriked && !GameManager.Instance.validPot && GameManager.Instance.ballTouchBeforeStrike.Count < 4)
+            {
+                GameManager.Instance.wasFault = true;
+                //if (GameManager.Instance.faultMessage.Length == 0)
+                GameManager.Instance.faultMessage = StaticStrings.invalidStrike;
+
+                //if (GameManager.Instance.ballTouchBeforeStrike.Count > 0) { // tutaj bylo 0
+                GameManager.Instance.ballsStriked = true;
+                /*if (!GameManager.Instance.offlineMode)
+                    PhotonNetwork.RaiseEvent(18, 1, true, null);*/
+                //}
+                PoolSocketManager.Instance.WinningIsCalled(18);
+                GameManager.Instance.ballTouchBeforeStrike.Clear();
+
+
+                if (!changedWhitePos)
+                {
+                    //                        GameManager.Instance.whiteBall.GetComponent<Rigidbody> ().transform.position = new Vector3 (-2.9f, -0.69f, -0.24f);
+                    //                        GameManager.Instance.whiteBall.GetComponent<Rigidbody> ().velocity = Vector3.zero;
+                    //                        GameManager.Instance.whiteBall.GetComponent<Rigidbody> ().angularVelocity = Vector3.zero;
+                    //                        GameManager.Instance.whiteBall.GetComponent<Rigidbody> ().constraints = RigidbodyConstraints.FreezePositionZ;
+                    //                        GameManager.Instance.whiteBall.GetComponent<LockZPosition> ().ballActive = true;
+                    //                        GameManager.Instance.whiteBall.SetActive (true);
+                    getNewWhiteBallPosition(false);
+                }
+                //GameManager.Instance.whiteBall.transform.position = new Vector3 (-2.9f, -0.69f, -0.24f);
+
+
             }
             else
             {
-                bool changedWhitePos = false;
+                //if (!GameManager.Instance.ballsStriked && GameManager.Instance.firstBallTouched) {
+                GameManager.Instance.ballsStriked = true;
+                /*if (!GameManager.Instance.offlineMode)
+                    PhotonNetwork.RaiseEvent(18, 1, true, null);*/
+                //}
+                PoolSocketManager.Instance.WinningIsCalled(18);
 
+                checkBallsTypes(GameManager.Instance.wasFault, true, false);
 
-
-
-                if (!GameManager.Instance.ballsStriked && !GameManager.Instance.validPot && GameManager.Instance.ballTouchBeforeStrike.Count < 4)
+                if (!GameManager.Instance.firstBallTouched)
                 {
                     GameManager.Instance.wasFault = true;
-                    //if (GameManager.Instance.faultMessage.Length == 0)
-                    GameManager.Instance.faultMessage = StaticStrings.invalidStrike;
+                    if (GameManager.Instance.faultMessage.Length == 0)
+                        GameManager.Instance.faultMessage = StaticStrings.faultCueBallDidntStrike;
 
-                    //if (GameManager.Instance.ballTouchBeforeStrike.Count > 0) { // tutaj bylo 0
-                    GameManager.Instance.ballsStriked = true;
-                    /*if (!GameManager.Instance.offlineMode)
-                        PhotonNetwork.RaiseEvent(18, 1, true, null);*/
-                    //}
-                    GameManager.Instance.ballTouchBeforeStrike.Clear();
+                }
+
+                if (GameManager.Instance.firstBallTouched && GameManager.Instance.ballTouchedBand == 0)
+                {
+                    GameManager.Instance.wasFault = true;
+                    if (GameManager.Instance.faultMessage.Length == 0)
+                        GameManager.Instance.faultMessage = StaticStrings.invalidShotNoBandContact;
+
+                }
+
+                if (!GameManager.Instance.validPot)
+                {
+                    GameManager.Instance.wasFault = true;
+                    if (GameManager.Instance.faultMessage.Length == 0)
+                        GameManager.Instance.faultMessage = "";
+                }
+
+                if (GameManager.Instance.wasFault && GameManager.Instance.faultMessage.Equals(StaticStrings.potedCueBall))
+                {
+
+                    getNewWhiteBallPosition(true);
+
+                }
+            }
 
 
-                    if (!changedWhitePos)
-                    {
-                        //                        GameManager.Instance.whiteBall.GetComponent<Rigidbody> ().transform.position = new Vector3 (-2.9f, -0.69f, -0.24f);
-                        //                        GameManager.Instance.whiteBall.GetComponent<Rigidbody> ().velocity = Vector3.zero;
-                        //                        GameManager.Instance.whiteBall.GetComponent<Rigidbody> ().angularVelocity = Vector3.zero;
-                        //                        GameManager.Instance.whiteBall.GetComponent<Rigidbody> ().constraints = RigidbodyConstraints.FreezePositionZ;
-                        //                        GameManager.Instance.whiteBall.GetComponent<LockZPosition> ().ballActive = true;
-                        //                        GameManager.Instance.whiteBall.SetActive (true);
-                        getNewWhiteBallPosition(false);
-                    }
-                    //GameManager.Instance.whiteBall.transform.position = new Vector3 (-2.9f, -0.69f, -0.24f);
 
 
+
+
+            opponentBallsStoped = true;
+            if(GameManager.Instance.offlineMode) 
+            {
+
+            } 
+            else 
+            {
+                if (GameManager.Instance.wasFault)
+                {
+                    if (GameManager.Instance.faultMessage.Length > 0)
+                        GameManager.Instance.audioSources[2].Play();
+                    setOpponentTurn();
                 }
                 else
                 {
-                    //if (!GameManager.Instance.ballsStriked && GameManager.Instance.firstBallTouched) {
-                    GameManager.Instance.ballsStriked = true;
-                    /*if (!GameManager.Instance.offlineMode)
-                        PhotonNetwork.RaiseEvent(18, 1, true, null);*/
-                    //}
-
-                    checkBallsTypes(GameManager.Instance.wasFault, true, false);
-
-                    if (!GameManager.Instance.firstBallTouched)
-                    {
-                        GameManager.Instance.wasFault = true;
-                        if (GameManager.Instance.faultMessage.Length == 0)
-                            GameManager.Instance.faultMessage = StaticStrings.faultCueBallDidntStrike;
-
-                    }
-
-                    if (GameManager.Instance.firstBallTouched && GameManager.Instance.ballTouchedBand == 0)
-                    {
-                        GameManager.Instance.wasFault = true;
-                        if (GameManager.Instance.faultMessage.Length == 0)
-                            GameManager.Instance.faultMessage = StaticStrings.invalidShotNoBandContact;
-
-                    }
-
-                    if (!GameManager.Instance.validPot)
-                    {
-                        GameManager.Instance.wasFault = true;
-                        if (GameManager.Instance.faultMessage.Length == 0)
-                            GameManager.Instance.faultMessage = "";
-                    }
-
-                    if (GameManager.Instance.wasFault && GameManager.Instance.faultMessage.Equals(StaticStrings.potedCueBall))
-                    {
-
-                        getNewWhiteBallPosition(true);
-
-                    }
+                    StartCoroutine(setMyTurn(false));
                 }
-
-
-
-
-
-
-                opponentBallsStoped = true;
-                if(GameManager.Instance.offlineMode) {
-
-                } else {
-                    if (GameManager.Instance.wasFault)
-                    {
-                        if (GameManager.Instance.faultMessage.Length > 0)
-                            GameManager.Instance.audioSources[2].Play();
-                        setOpponentTurn();
-                    }
-                    else
-                    {
-                        StartCoroutine(setMyTurn(false));
-                    }
-                }
+            }
 
                 
-            }
+        }
     }
 
     private void getNewWhiteBallPosition(bool center)
@@ -1020,30 +1062,41 @@ public class CueController : MonoBehaviour
                 GameManager.Instance.playersHaveTypes = true;
                 potedBallsGUI.potedBallsVisible = true;
 
-                if(GameManager.Instance.offlineMode) {
-                    if(GameManager.Instance.offlinePlayerTurn == 1) {
+                if(GameManager.Instance.offlineMode) 
+                {
+                    if(GameManager.Instance.offlinePlayerTurn == 1) 
+                    {
                         GameManager.Instance.offlinePlayer1OwnSolid = true;
                         GameManager.Instance.ownSolids = true;
                         potedBallsGUI.showPotedBalls(true);
                         
                         
-                    } else {
+                    } 
+                    else 
+                    {
                         GameManager.Instance.offlinePlayer1OwnSolid = false;
                         GameManager.Instance.ownSolids = true;
                         potedBallsGUI.showPotedBalls(false);
                         
                     }
-                } else {
+                } 
+                else 
+                {
                     // You got solid balls
                     //if (GameManager.Instance.cueController.isServer)
                     if(wasServer)
+                    {
                         potedBallsGUI.showPotedBalls(true);
+                    }
                     else
+                    {
                         potedBallsGUI.showPotedBalls(setSolid);
-                        //potedBallsGUI.showPotedBalls(false);
+                    }
+                    //potedBallsGUI.showPotedBalls(false);
 
                     /*if (!GameManager.Instance.offlineMode && wasServer)
                         PhotonNetwork.RaiseEvent(21, false, true, null);*/
+                    PoolSocketManager.Instance.PlayerBallType(21, false);
                 }
                 
             }
@@ -1052,26 +1105,35 @@ public class CueController : MonoBehaviour
                 GameManager.Instance.playersHaveTypes = true;
                 potedBallsGUI.potedBallsVisible = true;
 
-                if(GameManager.Instance.offlineMode) {
-                    if(GameManager.Instance.offlinePlayerTurn == 1) {
+                if(GameManager.Instance.offlineMode) 
+                {
+                    if(GameManager.Instance.offlinePlayerTurn == 1) 
+                    {
                         GameManager.Instance.offlinePlayer1OwnSolid = false;
                         GameManager.Instance.ownSolids = false;
                         potedBallsGUI.showPotedBalls(false);
-                    } else {
+                    } 
+                    else 
+                    {
                         GameManager.Instance.ownSolids = false;
                         GameManager.Instance.offlinePlayer1OwnSolid = true;
                         potedBallsGUI.showPotedBalls(true);
                     }
-                } else {
+                } 
+                else 
+                {
                     // You got striped balls
                     //if (GameManager.Instance.cueController.isServer)
                     if(wasServer)
+                    {
                         potedBallsGUI.showPotedBalls(false);
+                    }
                     else
                         potedBallsGUI.showPotedBalls(setSolid);
                         //potedBallsGUI.showPotedBalls(true);
                     /*if (!GameManager.Instance.offlineMode && wasServer)
                         PhotonNetwork.RaiseEvent(21, true, true, null);*/
+                    PoolSocketManager.Instance.PlayerBallType(21, true);
                 }
                 
             }
@@ -1102,11 +1164,13 @@ public class CueController : MonoBehaviour
                 whiteBallLimits.SetActive(true);
                 /*if (!GameManager.Instance.offlineMode)
                     PhotonNetwork.RaiseEvent(14, 1, true, null);*/
+                PoolSocketManager.Instance.MovingBall(14);
             }
             else
             {
                 /*if (!GameManager.Instance.offlineMode)    
                     PhotonNetwork.RaiseEvent(17, 1, true, null);*/
+                PoolSocketManager.Instance.MovingBall(17);
             }
         }
     }
@@ -1202,6 +1266,7 @@ public class CueController : MonoBehaviour
                 transform.position = new Vector3(newX, newY, transform.position.z);
                 /*if (!GameManager.Instance.offlineMode)
                     PhotonNetwork.RaiseEvent(15, transform.position, true, null);*/
+                PoolSocketManager.Instance.WhiteBallMovement(15, transform.position);
             }
         }
     }
@@ -1217,6 +1282,7 @@ public class CueController : MonoBehaviour
             whiteBallLimits.SetActive(false);
             /*if (!GameManager.Instance.offlineMode)
                 PhotonNetwork.RaiseEvent(16, 1, true, null);*/
+            PoolSocketManager.Instance.MovingBall(16);
         }
     }
 
@@ -1301,6 +1367,7 @@ public class CueController : MonoBehaviour
 
         if(!GameManager.Instance.iWon && !GameManager.Instance.iLost) {
             Invoke("ShowAllControllers", 0.25f);
+            //ShotPowerIndicator.anim.gameObject.SetActive(true);
             ShotPowerIndicator.anim.Play("MakeVisible");
         }
             
@@ -1363,8 +1430,10 @@ public class CueController : MonoBehaviour
 
         canShowControllers = true;
 
-        if(!GameManager.Instance.iWon && !GameManager.Instance.iLost) {
+        if(!GameManager.Instance.iWon && !GameManager.Instance.iLost) 
+        {
             Invoke("ShowAllControllers", 0.25f);
+            //ShotPowerIndicator.anim.gameObject.SetActive(true);
             ShotPowerIndicator.anim.Play("MakeVisible");
         }
 
@@ -1393,6 +1462,7 @@ public class CueController : MonoBehaviour
         multiplayerDataArray.Clear();
         startMovement = false;
         ShotPowerIndicator.anim.Play("ShotPowerAnimation");
+        //ShotPowerIndicator.anim.gameObject.SetActive(false);
         gameControllerScript.resetTimers(2, true);
     }
 
@@ -1531,6 +1601,7 @@ public class CueController : MonoBehaviour
                 if (isServer && initRot.eulerAngles != rot.eulerAngles) {
                     /*if (!GameManager.Instance.offlineMode)
                         PhotonNetwork.RaiseEvent(7, rot, true, null);*/
+                    PoolSocketManager.Instance.CueRotation(7, rot);
                 }
             }
 
@@ -1555,6 +1626,7 @@ public class CueController : MonoBehaviour
             if (isServer && initRot.eulerAngles != rot.eulerAngles) {
                 /*if (!GameManager.Instance.offlineMode)
                     PhotonNetwork.RaiseEvent(7, rot, true, null);*/
+                PoolSocketManager.Instance.CueRotation(7, rot);
             }
         } 
 
@@ -1706,4 +1778,199 @@ public class CueController : MonoBehaviour
 
         return output;
     }
+
+    #region SocketRecevingData
+
+    public void ProcessWonData(int code)
+    {
+        switch (code)
+        {
+            case 10:
+            {
+                // Opponents balls stoped movement. Can show cue and lines
+                checkShot();
+                break;
+            }
+            case 14:
+            {
+                // Opponent moving white ball before strike - show limits
+                whiteBallLimits.SetActive(true);
+                HideAllControllers();
+                break;
+            }
+            case 16:
+            {
+                // Opponent stoped moving white ball - hide limits
+                whiteBallLimits.SetActive(false);
+                ShowAllControllers();
+                break;
+            }
+            case 17:
+            {
+                // Opponent moving white ball after strike - hide controllers
+                HideAllControllers();
+                break;
+            }
+            case 18:
+            {
+                // Balls was striked correctly
+                GameManager.Instance.ballsStriked = true;
+                break; 
+            }
+            case 19:
+            {
+                // Opponent Won!
+                HideAllControllers();
+                GameManager.Instance.audioSources[3].Play();
+                youWonMessage.SetActive(true);
+                youWonMessage.GetComponent<YouWinMessageChangeSprite>().changeSprite();
+                youWonMessage.GetComponent<Animator>().Play("YouWinMessageAnimation");
+                GameManager.Instance.iWon = false;
+                break; 
+            }
+            case 20:
+            {
+                // Opponent Poted 8 ball - you won!
+                HideAllControllers();
+                GameManager.Instance.audioSources[3].Play();
+                youWonMessage.SetActive(true);
+                youWonMessage.GetComponent<Animator>().Play("YouWinMessageAnimation");
+                GameManager.Instance.iWon = true;
+                break; 
+            }
+        }
+    }
+
+    public void CheckBallType(bool type)
+    {
+        // Player got types
+        checkBallsTypes(false, false, type);
+    }
+
+    public void Turn(Vector3[] angelPosArray)
+    {
+        Vector3[] data = angelPosArray;
+        multiFirstShotPower = data[0];
+        multiFirstShotDirection = data[1];
+        firstShotDone = false;
+        multiplayerDataArray.Clear();
+    }
+
+    public void BallMovement(Vector3 angle)
+    {
+        // Opponent moving white ball
+        transform.position = angle;
+    }
+
+    public void CueRotation(Quaternion rot)
+    {
+        // Opponent rotated cue
+        cue.transform.rotation = rot;
+    }
+    
+    public void CueSpin(Vector3 angle)
+    {
+        // Cue spin controller changed value
+        cueSpinObject.GetComponent<SpinController>().changePositionOpponent(angle);
+    }
+    
+    public void SwitchUser(int code, Vector3 angle)
+    {
+        switch (code)
+        {
+            case 9:
+                // My turn - show cue and lines
+                cue.transform.position = angle;
+                StartCoroutine(setMyTurn(true));
+                break;
+            case 12:
+                // Opponents turn - no fault
+                cue.transform.position = angle;
+                setOpponentTurn();
+                break;
+        }
+    }
+
+    public void PotNumber(int num)
+    {
+        // Opponent called pocket
+        GameManager.Instance.gameControllerScript.showMessage(GameManager.Instance.nameOpponent + " " + StaticStrings.opponentCalledPocket);
+        calledPockets[num].SetActive(true);
+    }
+    
+    public void Power(Vector3 power)
+    {
+        // Shot power - move main cue
+        cue.transform.position = power;
+    }
+    
+    
+    public void Trigger(int code, Vector3[] data)
+    {
+        switch (code)
+        {
+            case 5:
+            {
+                multiplayerDataArray.Add(data);
+                counterFixPositionMulti++;
+                GameManager.Instance.stopTimer = true;
+
+                if (counterFixPositionMulti == 20)
+                {
+                    Debug.Log("AAAA");
+                    raisedSixEvent = false;
+                    startMovement = true;
+                    opponentShotStart = true;
+                    cue.GetComponent<Renderer>().enabled = false;
+                    targetLine.SetActive(false);
+                    ballsInMovement = true;
+                    canCount = true;
+                }
+
+                break;
+            }
+            case 6:
+                counterFixPositionMulti = 0;
+                multiplayerDataArray.Add(data);
+                break;
+        }
+    }
+    
+    public void FaultMessage(string data)
+    {
+        // Fault message
+        string message = data;
+
+        //if (message.Equals (StaticStrings.potedCueBall)) {
+        ballHand.SetActive(true);
+
+        GameManager.Instance.hasCueInHand = true;
+        //}
+
+        if (message.Equals(StaticStrings.invalidStrike) || (!GameManager.Instance.ballsStriked && message.Equals(StaticStrings.faultCueBallDidntStrike)))
+        {
+
+            getNewWhiteBallPosition(false);
+        }
+        else
+        {
+            if (message.Equals(StaticStrings.potedCueBall))
+            {
+
+
+                getNewWhiteBallPosition(true);
+            }
+        }
+        Vector3 newBallPos = GameManager.Instance.whiteBall.transform.position;
+        newBallPos.z = ballHand.transform.position.z;
+        ballHand.transform.position = newBallPos;
+        if (message.Contains("You"))
+        {
+            message = message.Replace("You", GameManager.Instance.nameOpponent);
+        }
+        GameManager.Instance.gameControllerScript.showMessage(message);
+        GameManager.Instance.faultMessage = "";
+    }
+
+    #endregion
 }

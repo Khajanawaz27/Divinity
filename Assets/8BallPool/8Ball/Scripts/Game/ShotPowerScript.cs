@@ -30,8 +30,13 @@ public class ShotPowerScript : MonoBehaviour {
         initColor = shotColorIndicator.GetComponent<SpriteRenderer>().color;
         anim = mainObject.GetComponent<Animator>();
         if (GameManager.Instance.roomOwner)
+        {
+            //anim.gameObject.SetActive(true);
             anim.Play("MakeVisible");
-        else {
+        }
+        else 
+        {
+            //anim.gameObject.SetActive(false);
             anim.Play("ShotPowerAnimation");
         }
 
@@ -58,6 +63,7 @@ public class ShotPowerScript : MonoBehaviour {
                 cueScript.shouldShot = true;
                 cueScript.startShoot = true;
                 cueMain.GetComponent<Renderer>().enabled = false;
+                //anim.gameObject.SetActive(false);
             }
 
             cue.transform.position = initialPos;
@@ -111,6 +117,7 @@ public class ShotPowerScript : MonoBehaviour {
             cueMain.transform.position = Vector3.MoveTowards(initMainCuePos, initMainCouPositionDetector, (initialPos.y - cue.transform.position.y) / 2);
             /*if (!GameManager.Instance.offlineMode)
                 PhotonNetwork.RaiseEvent(8, cueMain.transform.position, true, null);*/
+            PoolSocketManager.Instance.ShotPower(8, cueMain.transform.position);
 
             setIndicatorColor();
 

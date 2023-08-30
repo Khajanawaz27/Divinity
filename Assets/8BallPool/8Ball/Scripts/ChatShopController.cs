@@ -54,8 +54,8 @@ public class ChatShopController : MonoBehaviour {
 
     public void buyChat() {
         if (GameManager.Instance.coinsCount >= this.price) {
-            GameManager.Instance.playfabManager.addCoinsRequest(-this.price);
-            GameManager.Instance.playfabManager.updateBoughtChats(this.index);
+            //GameManager.Instance.playfabManager.addCoinsRequest(-this.price);
+            //GameManager.Instance.playfabManager.updateBoughtChats(this.index);
             button.GetComponent<Button>().interactable = false;
             buttonText.GetComponent<Text>().text = "Owned";
         } else {

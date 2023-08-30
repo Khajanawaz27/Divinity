@@ -60,7 +60,7 @@ public class PlayFabAddFriend : MonoBehaviour {
         GameManager.Instance.cueController.removeOnEventCall();
         //PhotonNetwork.LeaveRoom();
 
-        GameManager.Instance.playfabManager.roomOwner = false;
+        //GameManager.Instance.playfabManager.roomOwner = false;
         GameManager.Instance.roomOwner = false;
         GameManager.Instance.resetAllData();
 
