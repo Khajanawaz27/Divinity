@@ -37,7 +37,10 @@ public class MainMenuManager : MonoBehaviour
     public GameObject tranHistoryPrefab;
     public GameObject refferalPrefab;
     public GameObject withdrawErrorPrefab;
-
+    
+    [Header("--- Banner ---")]
+    public GameObject fullScreenAd;
+    public Transform fullScreenParent;
 
     [Header("--- Tournament ---")]
     public GameObject tournamentTeenPattiPrefab;
@@ -123,6 +126,7 @@ public class MainMenuManager : MonoBehaviour
         //GetTournament();
         //GetTran();
         DataManager.Instance.GetTournament();
+        GetFullScreenBanner();
     }
 
 
@@ -1211,6 +1215,86 @@ public class MainMenuManager : MonoBehaviour
 
 
     #endregion
+    
+    #region Banner
+
+    private void GetFullScreenBanner()
+    {
+        if (DataManager.Instance.IsOneTimeOpen) return;
+        StartCoroutine(GetBanners());
+        DataManager.Instance.IsOneTimeOpen = false;
+    }
+    IEnumerator GetBanners()
+    {
+        UnityWebRequest request = UnityWebRequest.Get(DataManager.Instance.url + "/api/v1/players/banners");
+        request.SetRequestHeader("Authorization", "Bearer " + PlayerPrefs.GetString("token"));
+        yield return request.SendWebRequest();
+
+        if (request.error == null && !request.isNetworkError)
+        {
+            print("Banner : " + request.downloadHandler.text);
+
+            JSONNode values = JSON.Parse(request.downloadHandler.text.ToString());
+            JSONNode data = JSON.Parse(values["data"].ToString());
+
+            if (data.Count == 0)
+            {
+                
+            }
+
+            if (data.Count <= 0) yield break;
+            int no = 0;
+
+            for (int i = 0; i < data.Count; i++)
+            {
+                if (data[i]["status"] != "active" || data[i]["location"] != "HOME" || data[i]["bannerType"] != "fullscreen") continue;
+                {
+                    GameObject fullScreenObj = Instantiate(fullScreenAd, fullScreenParent);
+                    string url = data[i]["url"];
+                    no++;
+                    FullScreenAd fullscreen = fullScreenObj.GetComponent<FullScreenAd>();
+                    fullScreenObj.AddComponent<Button>().onClick.AddListener(() => BannerClick(url));
+                    StartCoroutine(GetImages(data[i]["imageUrl"].ToString().Trim('"'), fullscreen.bannerImage));
+                }
+            }
+        }
+        else
+        {
+            Logger.log.Log(request.error.ToString());
+        }
+
+    }
+    
+    
+    void BannerClick(string bannerUrl)
+    {
+        //print("Banner URL : " + bannerUrl);
+        if (bannerUrl != "" && bannerUrl != null)
+        {
+            Application.OpenURL(bannerUrl);
+        }
+    }
+    
+    IEnumerator GetImages(string URl, Image image)
+    {
+        UnityWebRequest request = UnityWebRequestTexture.GetTexture(URl);
+        yield return request.SendWebRequest();
+
+        if (request.error == null)
+        {
+            var texture = DownloadHandlerTexture.GetContent(request);
+            Rect rect = new Rect(0, 0, texture.width, texture.height);
+            if (image != null)
+            {
+                image.sprite = Sprite.Create(texture, rect, new Vector2(0, 0));
+            }
+        }
+    }
+    
+
+    #endregion
+
+
 
     #region Prefab
 

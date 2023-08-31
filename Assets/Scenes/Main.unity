@@ -1085,6 +1085,8 @@ MonoBehaviour:
   tranHistoryPrefab: {fileID: 1206355101876808841, guid: edf7c239c5d674b0baca7e9789e6c560, type: 3}
   refferalPrefab: {fileID: 8110679150961090305, guid: 9b8e7ade2490b5446801ade62b765780, type: 3}
   withdrawErrorPrefab: {fileID: 5475588984052348003, guid: 6452c3b01cc564db589ab2ea90906233, type: 3}
+  fullScreenAd: {fileID: 2340232213768375609, guid: 2e6df3a5998b9b34681600e418e061e3, type: 3}
+  fullScreenParent: {fileID: 1802510034}
   tournamentTeenPattiPrefab: {fileID: 5413211444648753880, guid: beceba65a0bad4854afb440635520645, type: 3}
   tournamentLudoPrefab: {fileID: 1536066916714297203, guid: cfbb9b8a603fd48a0b35fac382394027, type: 3}
   ludoSelectorPrefab: {fileID: 0}
@@ -1103,6 +1105,7 @@ MonoBehaviour:
   offColor: {r: 0.38823533, g: 0.56078434, b: 0.85098046, a: 1}
   waitingPanel: {fileID: 722522596}
   playerNotFound: {fileID: 1139893810}
+  loadingScreen: {fileID: 0}
   leaveMainPanel: {fileID: 6786494746130590789, guid: 3e613567fdc99f94ca63e9bd3620c158, type: 3}
   screenObj: []
   notificationListPanel: {fileID: 8956089654198005673, guid: e33588b8a3798419d905891cccfd401e, type: 3}
@@ -41040,7 +41043,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 21.589844, y: 0}
+  m_AnchoredPosition: {x: 21.589722, y: 0}
   m_SizeDelta: {x: 477, y: 425}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &1270322841
@@ -53265,7 +53268,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -30.600098, y: 0}
+  m_AnchoredPosition: {x: -30.599976, y: 0}
   m_SizeDelta: {x: 477, y: 425}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1677678816
@@ -71915,7 +71918,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: -9, y: 153}
+  m_AnchoredPosition: {x: -8.999878, y: 153}
   m_SizeDelta: {x: 501, y: 425}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &3372022657127600734

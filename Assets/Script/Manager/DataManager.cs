@@ -72,6 +72,7 @@ public class DataManager : MonoBehaviour
     public bool isRestartManage;
     public bool isAvaliable;
     public float betPrice;
+    public bool IsOneTimeOpen = false;
 
 
 
